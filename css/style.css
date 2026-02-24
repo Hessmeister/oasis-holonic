@@ -1077,6 +1077,110 @@ nav.nav-collapsed.nav-dark .nav-hamburger span {
 
 
 /* ═══════════════════════════════════════
+   START BUILDING (Section 08)
+   ═══════════════════════════════════════ */
+
+.build-prompt-area {
+  margin-bottom: 2.5rem;
+}
+
+.build-terminal {
+  background: rgba(0,0,0,0.35);
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 680px;
+  font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.build-terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.6rem 1rem;
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.build-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+}
+
+.build-dot:first-child { background: rgba(255,100,80,0.6); }
+.build-dot:nth-child(2) { background: rgba(255,200,80,0.5); }
+.build-dot:nth-child(3) { background: rgba(80,200,100,0.5); }
+
+.build-terminal-title {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.35);
+  margin-left: 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+.build-terminal-body {
+  padding: 1.25rem 1.5rem;
+}
+
+.build-line {
+  font-size: 0.8rem;
+  line-height: 2;
+  color: rgba(255,255,255,0.85);
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.build-prompt {
+  color: rgba(255,255,255,0.45);
+  margin-right: 0.6rem;
+  user-select: none;
+}
+
+.build-output {
+  color: rgba(255,255,255,0.5);
+  font-style: italic;
+}
+
+.build-subtitle {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.6;
+  max-width: 520px;
+}
+
+.build-card {
+  position: relative;
+}
+
+.build-link {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  border-bottom: 1px solid rgba(255,255,255,0.35);
+  padding-bottom: 2px;
+  transition: border-color 0.3s;
+}
+
+.build-link:hover {
+  border-color: #fff;
+}
+
+/* Override orange section code styling for terminal */
+.section--orange .build-terminal code {
+  background: none;
+  padding: 0;
+  color: rgba(255,255,255,0.7);
+  font-size: 0.8rem;
+}
+
+
+/* ═══════════════════════════════════════
    FOOTER
    ═══════════════════════════════════════ */
 
@@ -1174,4 +1278,7 @@ nav.nav-collapsed.nav-dark .nav-hamburger span {
 
   .prov-grid { grid-template-columns: 1fr; gap: 0.5rem; }
   .prov-grid > .vdiv { display: none; }
+
+  .build-terminal { max-width: 100%; }
+  .build-line { font-size: 0.7rem; white-space: pre-wrap; word-break: break-all; }
 }

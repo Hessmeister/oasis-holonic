@@ -21,6 +21,7 @@
     <a href="#holarchy">Holarchy</a>
     <a href="#providers">Providers</a>
     <a href="#star">STAR ODK</a>
+    <a href="#build">Build</a>
     <a href="https://github.com/NextGenSoftwareUK/OASIS" target="_blank" class="nav-btn">Source</a>
   </div>
   <button class="nav-hamburger" aria-label="Menu">
@@ -375,6 +376,60 @@
         <div class="col4-num">14</div>
         <h3 class="col4-title">Cross-App</h3>
         <p class="col4-desc">Log in once. Your profile, reputation, and assets follow you across the entire OASIS ecosystem.</p>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- 08 — START BUILDING -->
+  <section id="build" class="section section--orange reveal">
+
+    <div class="section-head">
+      <span class="sh-num">08</span>
+      <h2>Start<br><em>building</em></h2>
+    </div>
+
+    <div class="build-prompt-area">
+      <div class="build-terminal">
+        <div class="build-terminal-bar">
+          <span class="build-dot"></span>
+          <span class="build-dot"></span>
+          <span class="build-dot"></span>
+          <span class="build-terminal-title">terminal</span>
+        </div>
+        <div class="build-terminal-body">
+          <p class="build-line"><span class="build-prompt">$</span> dotnet new -i NextGenSoftware.OASIS.STAR.CLI.Templates</p>
+          <p class="build-line"><span class="build-prompt">$</span> dotnet new oasis-moon -n MyFirstOAPP</p>
+          <p class="build-line"><span class="build-prompt">$</span> cd MyFirstOAPP &amp;&amp; dotnet run</p>
+          <p class="build-line build-output">&#10003; OASIS API booted &mdash; default provider: MongoDB</p>
+          <p class="build-line build-output">&#10003; Moon &ldquo;MyFirstOAPP&rdquo; live at localhost:5000</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="build-subtitle">Three commands to a running holonic app. Pick a path to go deeper:</p>
+
+    <div class="col3 stagger" style="margin-top:2.5rem;">
+      <div class="col3-item build-card">
+        <div class="col3-num">→</div>
+        <h3 class="col3-title">Clone &amp; Explore</h3>
+        <p class="col3-desc">Fork the repo, spin up the REST API locally, and explore the holon CRUD endpoints. Best if you learn by reading code.</p>
+        <a href="https://github.com/NextGenSoftwareUK/OASIS" target="_blank" class="build-link">View on GitHub &rarr;</a>
+      </div>
+      <div class="vdiv"></div>
+      <div class="col3-item build-card">
+        <div class="col3-num">→</div>
+        <h3 class="col3-title">Build a Moon</h3>
+        <p class="col3-desc">Use the STAR CLI to scaffold a Moon &mdash; the smallest holonic app. Add zomes, wire a provider, and deploy. Best first project.</p>
+        <a href="https://github.com/NextGenSoftwareUK/OASIS/wiki" target="_blank" class="build-link">Read the guide &rarr;</a>
+      </div>
+      <div class="vdiv"></div>
+      <div class="col3-item build-card">
+        <div class="col3-num">→</div>
+        <h3 class="col3-title">Write a Provider</h3>
+        <p class="col3-desc">Implement <code>IOASISStorageProvider</code> for a new backend &mdash; a new database, chain, or protocol. Advanced, high-impact contribution.</p>
+        <a href="https://github.com/NextGenSoftwareUK/OASIS/wiki" target="_blank" class="build-link">Provider docs &rarr;</a>
       </div>
     </div>
 
