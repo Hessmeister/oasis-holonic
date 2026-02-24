@@ -1,6 +1,7 @@
 /* ═══════════════════════════════════════
    flow.js — Data flow between holons
    Particles traveling between nodes
+   Labels light up when particles pass near
    ═══════════════════════════════════════ */
 
 import { observeCanvas, prefersReducedMotion } from './main.js';
@@ -15,6 +16,9 @@ class FlowAnimation {
     this.particles = [];
     this.revealed = false;
     this.revealProgress = 0;
+
+    // Track lit state per node
+    this._litState = {};
 
     // Nodes — positioned as ratios
     this.nodes = [
@@ -103,11 +107,64 @@ class FlowAnimation {
     }
   }
 
+  /* ── Check if any particle is near a node ── */
+  isParticleNearNode(nodeIdx, t) {
+    const nPos = this.nodePos(nodeIdx);
+    const hitRadius = Math.max(30, this.w * 0.035);
+
+    for (const p of this.particles) {
+      // A particle is "at" its destination when t is high, or "at" its source when t is low
+      const from = this.nodePos(p.from);
+      const to = this.nodePos(p.to);
+
+      const ease = p.t < 0.5
+        ? 2 * p.t * p.t
+        : 1 - Math.pow(-2 * p.t + 2, 2) / 2;
+
+      const px = from.x + (to.x - from.x) * ease;
+      const py = from.y + (to.y - from.y) * ease;
+
+      const dist = Math.sqrt((px - nPos.x) ** 2 + (py - nPos.y) ** 2);
+      if (dist < hitRadius) return true;
+    }
+    return false;
+  }
+
+  /* ── Smooth lit state with fade-out ── */
+  getNodeLit(nodeIdx, isHit, t) {
+    const key = 'node_' + nodeIdx;
+    if (!this._litState[key]) this._litState[key] = { litAt: 0, val: 0 };
+
+    const state = this._litState[key];
+    const litDuration = 700; // ms
+
+    if (isHit) {
+      state.litAt = t;
+    }
+
+    const elapsed = t - state.litAt;
+    if (elapsed < litDuration) {
+      const progress = elapsed / litDuration;
+      if (progress < 0.08) {
+        state.val = progress / 0.08; // fast ramp up
+      } else if (progress < 0.5) {
+        state.val = 1.0; // hold bright
+      } else {
+        state.val = 1.0 - ((progress - 0.5) / 0.5); // smooth fade out
+      }
+    } else {
+      state.val = 0;
+    }
+
+    return state.val;
+  }
+
   draw(t) {
     const { ctx, w, h } = this;
     ctx.clearRect(0, 0, w, h);
 
     const rp = this.revealProgress;
+    const isLooping = rp >= 1;
 
     // Draw edges
     this.edges.forEach(([a, b], i) => {
@@ -127,7 +184,7 @@ class FlowAnimation {
       ctx.stroke();
     });
 
-    // Draw nodes
+    // Draw nodes with lit-up effect
     this.nodes.forEach((node, i) => {
       const nodeP = Math.max(0, Math.min(1, rp * 3 - i * 0.15));
       if (nodeP <= 0) return;
@@ -135,24 +192,59 @@ class FlowAnimation {
       const { x, y } = this.nodePos(i);
       const size = 8;
 
-      // Shape
+      // Check proximity & get lit value
+      const isHit = isLooping && this.isParticleNearNode(i, t);
+      const lit = isLooping ? this.getNodeLit(i, isHit, t) : 0;
+
+      // Shape stroke — brightens when lit
+      const strokeAlpha = 0.6 + lit * 0.4;
+      const strokeWidth = 1 + lit * 0.8;
+
+      // Glow around node when lit
+      if (lit > 0.05) {
+        const glow = ctx.createRadialGradient(x, y, 0, x, y, size * 3.5);
+        glow.addColorStop(0, `rgba(255,255,255,${0.2 * lit})`);
+        glow.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = glow;
+        ctx.fillRect(x - size * 4, y - size * 4, size * 8, size * 8);
+      }
+
       this.drawShape(ctx, x, y, node.shape, size * nodeP);
-      ctx.strokeStyle = `rgba(255,255,255,${0.6 * nodeP})`;
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = `rgba(255,255,255,${strokeAlpha * nodeP})`;
+      ctx.lineWidth = strokeWidth;
       ctx.stroke();
 
-      // Label
+      // Label — lights up bold and bright when particle is near
       if (nodeP > 0.5) {
         const labelA = (nodeP - 0.5) * 2;
-        ctx.fillStyle = `rgba(255,255,255,${0.85 * labelA})`;
-        ctx.font = '400 10px Inter, sans-serif';
+        const baseAlpha = 0.85;
+        const litAlpha = 1.0;
+        const alpha = (baseAlpha + lit * (litAlpha - baseAlpha)) * labelA;
+        const weight = lit > 0.3 ? 700 : 400;
+        const fontSize = 10 + lit * 3;
+        const scale = 1 + lit * 0.1;
+
+        ctx.save();
+        ctx.translate(x, y + size + 16);
+        ctx.scale(scale, scale);
+
+        // Text glow when lit
+        if (lit > 0.05) {
+          ctx.shadowColor = `rgba(255,255,255,${0.7 * lit})`;
+          ctx.shadowBlur = 14 * lit;
+        }
+
+        ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+        ctx.font = `${weight} ${fontSize}px Inter, sans-serif`;
         ctx.textAlign = 'center';
-        ctx.fillText(node.label, x, y + size + 16);
+        ctx.textBaseline = 'top';
+        ctx.fillText(node.label, 0, 0);
+        ctx.restore();
       }
     });
 
     // Update & draw particles
-    if (rp >= 1) {
+    if (isLooping) {
       // Spawn occasionally
       if (Math.random() < 0.04) this.spawnParticle();
 
