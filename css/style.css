@@ -477,11 +477,11 @@ nav {
 
 
 /* ═══════════════════════════════════════
-   DARK sections — deep aquamarine
+   DARK sections — dark gray
    Kernel, deep content
    ═══════════════════════════════════════ */
 .section--dark::before {
-  background: #014D4E;
+  background: #1A1A1A;
 }
 
 .section--dark {
