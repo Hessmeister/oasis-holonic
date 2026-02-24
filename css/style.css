@@ -916,8 +916,57 @@ nav.nav-collapsed.nav-dark .nav-hamburger span {
 
 
 /* ═══════════════════════════════════════
-   HOLARCHY (Section 03) — orbit hero
+   HOLARCHY (Section 03)
    ═══════════════════════════════════════ */
+
+.holarchy-intro {
+  display: grid;
+  grid-template-columns: 1.6fr 1px 1fr;
+  gap: 0 2.5rem;
+  margin-bottom: 3.5rem;
+}
+
+.holarchy-intro-left p {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.78);
+  margin-bottom: 1rem;
+}
+
+.holarchy-intro-left p strong {
+  color: var(--orange);
+  font-weight: 600;
+}
+
+.holarchy-intro-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.holarchy-intro > .vdiv {
+  background: rgba(255,255,255,0.12);
+}
+
+.holarchy-mapping-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--orange);
+  margin-bottom: 0.8rem;
+}
+
+.holarchy-mapping {
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.55);
+}
+
+.holarchy-mapping strong {
+  color: rgba(255,255,255,0.9);
+  font-weight: 600;
+}
 
 .orbit-hero {
   width: 100%;
@@ -1113,6 +1162,8 @@ nav.nav-collapsed.nav-dark .nav-hamburger span {
 
   .col4 { grid-template-columns: 1fr 1px 1fr; }
 
+  .holarchy-intro { grid-template-columns: 1fr; gap: 2rem; }
+  .holarchy-intro > .vdiv { display: none; }
   .orbit-hero { max-width: 400px; }
 
   .footer { grid-template-columns: 1fr; gap: 1.5rem 0; }
