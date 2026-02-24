@@ -26,23 +26,49 @@ function observeCanvas(canvas, onVisible, onHidden) {
   obs.observe(canvas);
 }
 
-// ── Smooth nav hide/show on scroll ──
+// ── Nav: collapses to hamburger when scrolled past hero ──
 function initNav() {
   const nav = document.querySelector('nav');
   if (!nav) return;
-  let lastY = 0;
 
-  window.addEventListener('scroll', () => {
+  const hamburger = nav.querySelector('.nav-hamburger');
+  const heroSection = document.querySelector('.hero');
+  const threshold = heroSection ? heroSection.offsetHeight * 0.5 : 300;
+
+  // Toggle collapsed state based on scroll position
+  function updateNav() {
     const y = window.scrollY;
-    if (y > 100 && y > lastY) {
-      nav.style.transform = 'translateY(-100%)';
+    if (y > threshold) {
+      nav.classList.add('nav-collapsed');
     } else {
-      nav.style.transform = 'translateY(0)';
+      nav.classList.remove('nav-collapsed');
+      nav.classList.remove('nav-open'); // close menu when scrolling back up
     }
-    lastY = y;
-  }, { passive: true });
+  }
 
-  nav.style.transition = 'transform 0.4s cubic-bezier(0.25,1,0.5,1), opacity 0.4s';
+  window.addEventListener('scroll', updateNav, { passive: true });
+  updateNav(); // initial check
+
+  // Hamburger toggle
+  if (hamburger) {
+    hamburger.addEventListener('click', () => {
+      nav.classList.toggle('nav-open');
+    });
+  }
+
+  // Close menu when clicking a link
+  nav.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+      nav.classList.remove('nav-open');
+    });
+  });
+
+  // Close menu on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && nav.classList.contains('nav-open')) {
+      nav.classList.remove('nav-open');
+    }
+  });
 }
 
 // ── Boot ──
