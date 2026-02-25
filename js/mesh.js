@@ -78,21 +78,21 @@ class GyroscopeAnimation {
       {
         radius: 0.16, segments: 100, lineWidth: 1.8,
         tiltX: 0.3, tiltY: 0, tiltZ: 0,
-        spinAxis: 'y', spinSpeed: 0.00084, spinAngle: 0,
+        spinAxis: 'y', spinSpeed: 0.0005, spinAngle: 0,
         color: W, opacity: 0.6,
         dashPattern: null, bloomDelay: 200,
       },
       {
         radius: 0.21, segments: 100, lineWidth: 1.5,
         tiltX: PI * 0.42, tiltY: PI * 0.15, tiltZ: 0,
-        spinAxis: 'x', spinSpeed: -0.0007, spinAngle: 0,
+        spinAxis: 'x', spinSpeed: -0.00042, spinAngle: 0,
         color: W, opacity: 0.45,
         dashPattern: null, bloomDelay: 350,
       },
       {
         radius: 0.19, segments: 100, lineWidth: 1.0,
         tiltX: PI * 0.52, tiltY: 0, tiltZ: PI * 0.3,
-        spinAxis: 'z', spinSpeed: 0.00063, spinAngle: 0,
+        spinAxis: 'z', spinSpeed: 0.000378, spinAngle: 0,
         color: W, opacity: 0.3,
         dashPattern: [4, 5], bloomDelay: 500,
       },
@@ -101,21 +101,21 @@ class GyroscopeAnimation {
       {
         radius: 0.30, segments: 140, lineWidth: 1.1,
         tiltX: 0.15, tiltY: PI * 0.25, tiltZ: 0,
-        spinAxis: 'y', spinSpeed: 0.00049, spinAngle: 0,
+        spinAxis: 'y', spinSpeed: 0.000294, spinAngle: 0,
         color: W, opacity: 0.28,
         dashPattern: null, bloomDelay: 650,
       },
       {
         radius: 0.34, segments: 140, lineWidth: 0.9,
         tiltX: PI * 0.35, tiltY: 0, tiltZ: PI * 0.5,
-        spinAxis: 'x', spinSpeed: -0.00042, spinAngle: 0,
+        spinAxis: 'x', spinSpeed: -0.000252, spinAngle: 0,
         color: W, opacity: 0.22,
         dashPattern: [5, 7], bloomDelay: 800,
       },
       {
         radius: 0.28, segments: 120, lineWidth: 0.8,
         tiltX: PI * 0.6, tiltY: PI * 0.4, tiltZ: 0,
-        spinAxis: 'z', spinSpeed: 0.00056, spinAngle: 0,
+        spinAxis: 'z', spinSpeed: 0.000336, spinAngle: 0,
         color: W, opacity: 0.18,
         dashPattern: [3, 4], bloomDelay: 750,
       },
@@ -124,14 +124,14 @@ class GyroscopeAnimation {
       {
         radius: 0.42, segments: 180, lineWidth: 0.7,
         tiltX: 0.1, tiltY: PI * 0.1, tiltZ: PI * 0.2,
-        spinAxis: 'y', spinSpeed: 0.00028, spinAngle: 0,
+        spinAxis: 'y', spinSpeed: 0.000168, spinAngle: 0,
         color: W, opacity: 0.14,
         dashPattern: [2, 4], bloomDelay: 1000,
       },
       {
         radius: 0.46, segments: 180, lineWidth: 0.5,
         tiltX: PI * 0.45, tiltY: PI * 0.3, tiltZ: 0,
-        spinAxis: 'x', spinSpeed: -0.000245, spinAngle: 0,
+        spinAxis: 'x', spinSpeed: -0.000147, spinAngle: 0,
         color: W, opacity: 0.10,
         dashPattern: [2, 3], bloomDelay: 1200,
       },
@@ -149,7 +149,7 @@ class GyroscopeAnimation {
         this.particles.push({
           ringIdx: r,
           angle: Math.random() * TAU,
-          speed: (0.0007 + Math.random() * 0.00105) * (r < 3 ? 1.3 : 0.8),
+          speed: (0.00042 + Math.random() * 0.00063) * (r < 3 ? 1.3 : 0.8),
           size: 1.0 + Math.random() * 1.8,
           baseAlpha: 0.35 + Math.random() * 0.45,
           color: W,
@@ -166,9 +166,9 @@ class GyroscopeAnimation {
         x: (Math.random() - 0.5) * 1.1,
         y: (Math.random() - 0.5) * 1.1,
         z: (Math.random() - 0.5) * 0.5,
-        vx: (Math.random() - 0.5) * 0.000035,
-        vy: (Math.random() - 0.5) * 0.000035,
-        vz: (Math.random() - 0.5) * 0.000021,
+        vx: (Math.random() - 0.5) * 0.000021,
+        vy: (Math.random() - 0.5) * 0.000021,
+        vz: (Math.random() - 0.5) * 0.0000126,
         size: 0.5 + Math.random() * 1.0,
         baseAlpha: 0.1 + Math.random() * 0.15,
         color: W,
@@ -186,9 +186,9 @@ class GyroscopeAnimation {
       bloomDelay: 0,
       // White inner mini-rings orbiting the core
       innerRings: [
-        { radius: 0.085, tiltX: 0.8, tiltY: 0, speed: 0.0021, angle: 0, opacity: 0.35, width: 0.8 },
-        { radius: 0.105, tiltX: 0, tiltY: 1.2, speed: -0.00175, angle: PI * 0.7, opacity: 0.25, width: 0.7 },
-        { radius: 0.095, tiltX: 1.4, tiltY: 0.5, speed: 0.0014, angle: PI * 1.3, opacity: 0.2, width: 0.6 },
+        { radius: 0.085, tiltX: 0.8, tiltY: 0, speed: 0.00126, angle: 0, opacity: 0.35, width: 0.8 },
+        { radius: 0.105, tiltX: 0, tiltY: 1.2, speed: -0.00105, angle: PI * 0.7, opacity: 0.25, width: 0.7 },
+        { radius: 0.095, tiltX: 1.4, tiltY: 0.5, speed: 0.00084, angle: PI * 1.3, opacity: 0.2, width: 0.6 },
       ],
     };
   }
@@ -283,8 +283,8 @@ class GyroscopeAnimation {
   /* ── Apply global rotation ── */
   _applyGlobalRotation(p, t) {
     let pt = p;
-    pt = rotateY(pt, t * 0.000056);
-    pt = rotateX(pt, t * 0.000028);
+    pt = rotateY(pt, t * 0.0000336);
+    pt = rotateX(pt, t * 0.0000168);
     pt = rotateX(pt, this.tiltX);
     pt = rotateY(pt, this.tiltY);
     return pt;
