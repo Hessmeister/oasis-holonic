@@ -429,6 +429,27 @@ class GyroscopeAnimation {
     ctx.fillStyle = grad;
     ctx.fill();
 
+    // Subtle shadow on bottom-right — visible when dimming, fades on ignition
+    const shadowAlpha = (1 - hbPulse) * 0.35 * b;
+    if (shadowAlpha > 0.01) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'multiply';
+      // Offset gradient center toward upper-left so shadow falls on bottom-right
+      const shOff = r * 0.3;
+      const shGrad = ctx.createRadialGradient(
+        cx - shOff, cy - shOff, r * 0.15,
+        cx + shOff * 0.4, cy + shOff * 0.4, r * 1.05
+      );
+      shGrad.addColorStop(0, `rgba(255,255,255,1)`);
+      shGrad.addColorStop(0.5, `rgba(200,120,80,${1 - shadowAlpha * 0.3})`);
+      shGrad.addColorStop(1, `rgba(80,20,0,${1 - shadowAlpha * 0.8})`);
+      ctx.fillStyle = shGrad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+    }
+
     // Hot-white bloom overlay on peak ignition
     if (hbPulse > 0.1) {
       ctx.save();
