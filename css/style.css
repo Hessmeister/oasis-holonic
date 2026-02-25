@@ -435,6 +435,7 @@ nav.nav-collapsed.nav-open .nav-links {
   padding: 6rem 0;
   border-top: 1px solid var(--border);
   position: relative;
+  isolation: isolate;
 }
 
 /* Accent bar at section top */
