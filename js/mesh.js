@@ -430,23 +430,23 @@ class GyroscopeAnimation {
     ctx.fill();
 
     // Subtle shadow on bottom-right — visible when dimming, fades on ignition
-    const shadowAlpha = (1 - hbPulse) * 0.35 * b;
-    if (shadowAlpha > 0.01) {
+    const shadowStrength = (1 - hbPulse) * 0.25 * b;
+    if (shadowStrength > 0.01) {
       ctx.save();
-      ctx.globalCompositeOperation = 'multiply';
-      // Offset gradient center toward upper-left so shadow falls on bottom-right
-      const shOff = r * 0.3;
-      const shGrad = ctx.createRadialGradient(
-        cx - shOff, cy - shOff, r * 0.15,
-        cx + shOff * 0.4, cy + shOff * 0.4, r * 1.05
-      );
-      shGrad.addColorStop(0, `rgba(255,255,255,1)`);
-      shGrad.addColorStop(0.5, `rgba(200,120,80,${1 - shadowAlpha * 0.3})`);
-      shGrad.addColorStop(1, `rgba(80,20,0,${1 - shadowAlpha * 0.8})`);
-      ctx.fillStyle = shGrad;
+      // Dark overlay offset toward bottom-right, clipped to the sphere
       ctx.beginPath();
       ctx.arc(cx, cy, r, 0, TAU);
-      ctx.fill();
+      ctx.clip();
+      const shOff = r * 0.35;
+      const shGrad = ctx.createRadialGradient(
+        cx - shOff, cy - shOff, r * 0.4,
+        cx + shOff * 0.5, cy + shOff * 0.5, r * 1.1
+      );
+      shGrad.addColorStop(0, 'rgba(0,0,0,0)');
+      shGrad.addColorStop(0.6, `rgba(0,0,0,${shadowStrength * 0.15})`);
+      shGrad.addColorStop(1, `rgba(0,0,0,${shadowStrength * 0.4})`);
+      ctx.fillStyle = shGrad;
+      ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
       ctx.restore();
     }
 
