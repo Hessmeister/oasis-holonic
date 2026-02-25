@@ -74,23 +74,23 @@ class GyroscopeAnimation {
     // All rings are white — varying opacity and line weight for depth
     const W = [255, 255, 255];
     this.rings = [
-      // Inner rings — tight, fast
+      // Inner rings — spread wider from the core
       {
-        radius: 0.16, segments: 100, lineWidth: 2.0,
+        radius: 0.22, segments: 100, lineWidth: 2.0,
         tiltX: 0.3, tiltY: 0, tiltZ: 0,
         spinAxis: 'y', spinSpeed: 0.0005, spinAngle: 0,
         color: W, opacity: 0.65,
         dashPattern: null, bloomDelay: 200,
       },
       {
-        radius: 0.21, segments: 100, lineWidth: 1.7,
+        radius: 0.28, segments: 100, lineWidth: 1.7,
         tiltX: PI * 0.42, tiltY: PI * 0.15, tiltZ: 0,
         spinAxis: 'x', spinSpeed: -0.00042, spinAngle: 0,
         color: W, opacity: 0.50,
         dashPattern: null, bloomDelay: 350,
       },
       {
-        radius: 0.19, segments: 100, lineWidth: 1.2,
+        radius: 0.25, segments: 100, lineWidth: 1.2,
         tiltX: PI * 0.52, tiltY: 0, tiltZ: PI * 0.3,
         spinAxis: 'z', spinSpeed: 0.000378, spinAngle: 0,
         color: W, opacity: 0.35,
@@ -99,21 +99,21 @@ class GyroscopeAnimation {
 
       // Middle rings
       {
-        radius: 0.30, segments: 140, lineWidth: 1.3,
+        radius: 0.36, segments: 140, lineWidth: 1.3,
         tiltX: 0.15, tiltY: PI * 0.25, tiltZ: 0,
         spinAxis: 'y', spinSpeed: 0.000294, spinAngle: 0,
         color: W, opacity: 0.32,
         dashPattern: null, bloomDelay: 650,
       },
       {
-        radius: 0.34, segments: 140, lineWidth: 1.1,
+        radius: 0.40, segments: 140, lineWidth: 1.1,
         tiltX: PI * 0.35, tiltY: 0, tiltZ: PI * 0.5,
         spinAxis: 'x', spinSpeed: -0.000252, spinAngle: 0,
         color: W, opacity: 0.26,
         dashPattern: [5, 7], bloomDelay: 800,
       },
       {
-        radius: 0.28, segments: 120, lineWidth: 1.0,
+        radius: 0.34, segments: 120, lineWidth: 1.0,
         tiltX: PI * 0.6, tiltY: PI * 0.4, tiltZ: 0,
         spinAxis: 'z', spinSpeed: 0.000336, spinAngle: 0,
         color: W, opacity: 0.22,
@@ -202,9 +202,9 @@ class GyroscopeAnimation {
       bloomDelay: 0,
       // White inner mini-rings orbiting the core
       innerRings: [
-        { radius: 0.085, tiltX: 0.8, tiltY: 0, speed: 0.00126, angle: 0, opacity: 0.35, width: 0.8 },
-        { radius: 0.105, tiltX: 0, tiltY: 1.2, speed: -0.00105, angle: PI * 0.7, opacity: 0.25, width: 0.7 },
-        { radius: 0.095, tiltX: 1.4, tiltY: 0.5, speed: 0.00084, angle: PI * 1.3, opacity: 0.2, width: 0.6 },
+        { radius: 0.11, tiltX: 0.8, tiltY: 0, speed: 0.00126, angle: 0, opacity: 0.35, width: 0.8 },
+        { radius: 0.14, tiltX: 0, tiltY: 1.2, speed: -0.00105, angle: PI * 0.7, opacity: 0.25, width: 0.7 },
+        { radius: 0.125, tiltX: 1.4, tiltY: 0.5, speed: 0.00084, angle: PI * 1.3, opacity: 0.2, width: 0.6 },
       ],
     };
   }
