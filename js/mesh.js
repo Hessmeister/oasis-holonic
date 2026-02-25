@@ -347,41 +347,63 @@ class GyroscopeAnimation {
     ctx.restore();
   }
 
-  /* ── Draw core: flat matte orange sphere with heartbeat ignition ── */
+  /* ── Draw core: blazing sun with heartbeat pulse ── */
   _drawCore(ctx, t, cx, cy, scale, fov) {
     const b = this.core.bloom;
     if (b < 0.01) return;
 
-    // Heartbeat: core ignites brighter, then the glow expands outward
+    // Heartbeat
     const hbPhase = this.heartbeat ? this.heartbeat.phase % 1 : 0;
-    // Sharp ignition peak — rises fast, decays slowly
     const hbRaw = Math.sin(hbPhase * TAU);
     const hbIgnite = Math.pow(Math.max(0, hbRaw), 1.5);
-    // Secondary beat
     const hb2Raw = Math.sin(((hbPhase + 0.15) % 1) * TAU);
     const hb2Ignite = Math.pow(Math.max(0, hb2Raw), 1.5) * 0.4;
     const hbPulse = Math.min(1, hbIgnite + hb2Ignite);
 
-    const pulse = Math.sin(this.core.pulsePhase) * 0.06;
-    // Core swells slightly on heartbeat
-    const hbSwell = 1 + hbPulse * 0.08;
+    const pulse = Math.sin(this.core.pulsePhase) * 0.04;
+    const hbSwell = 1 + hbPulse * 0.1;
     const r = this.core.radius * scale * (1 + pulse) * b * hbSwell;
 
-    // Outer glow — expands dramatically from the core ignition
+    // ── Layer 1: Deep red corona (outermost glow) ──
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    const glowIntensity = 1 + hbPulse * 1.2;
-    const glowR = r * (3.5 + hbPulse * 3.0);
-    const glow = ctx.createRadialGradient(cx, cy, r * 0.5, cx, cy, glowR);
-    glow.addColorStop(0, `rgba(255,70,10,${0.12 * glowIntensity * b})`);
-    glow.addColorStop(0.3, `rgba(255,55,0,${0.06 * glowIntensity * b})`);
-    glow.addColorStop(0.7, `rgba(255,40,0,${0.02 * glowIntensity * b})`);
-    glow.addColorStop(1, 'rgba(255,30,0,0)');
-    ctx.fillStyle = glow;
-    ctx.fillRect(cx - glowR, cy - glowR, glowR * 2, glowR * 2);
+    const coronaR = r * (5 + hbPulse * 4);
+    const corona = ctx.createRadialGradient(cx, cy, r * 0.6, cx, cy, coronaR);
+    const ci = 1 + hbPulse * 1.5;
+    corona.addColorStop(0, `rgba(200,40,0,${0.14 * ci * b})`);
+    corona.addColorStop(0.25, `rgba(180,20,0,${0.08 * ci * b})`);
+    corona.addColorStop(0.5, `rgba(140,10,0,${0.04 * ci * b})`);
+    corona.addColorStop(0.8, `rgba(100,5,0,${0.015 * ci * b})`);
+    corona.addColorStop(1, 'rgba(60,0,0,0)');
+    ctx.fillStyle = corona;
+    ctx.fillRect(cx - coronaR, cy - coronaR, coronaR * 2, coronaR * 2);
     ctx.restore();
 
-    // White inner mini-rings orbiting the core
+    // ── Layer 2: Orange-red mid glow ──
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const midGlowR = r * (2.8 + hbPulse * 2);
+    const midGlow = ctx.createRadialGradient(cx, cy, r * 0.8, cx, cy, midGlowR);
+    midGlow.addColorStop(0, `rgba(255,80,0,${0.18 * ci * b})`);
+    midGlow.addColorStop(0.4, `rgba(255,50,0,${0.08 * ci * b})`);
+    midGlow.addColorStop(1, 'rgba(200,20,0,0)');
+    ctx.fillStyle = midGlow;
+    ctx.fillRect(cx - midGlowR, cy - midGlowR, midGlowR * 2, midGlowR * 2);
+    ctx.restore();
+
+    // ── Layer 3: Bright orange inner glow ──
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const innerGlowR = r * (1.8 + hbPulse * 0.8);
+    const innerGlow = ctx.createRadialGradient(cx, cy, r * 0.3, cx, cy, innerGlowR);
+    innerGlow.addColorStop(0, `rgba(255,160,40,${0.2 * ci * b})`);
+    innerGlow.addColorStop(0.5, `rgba(255,100,10,${0.1 * ci * b})`);
+    innerGlow.addColorStop(1, 'rgba(255,60,0,0)');
+    ctx.fillStyle = innerGlow;
+    ctx.fillRect(cx - innerGlowR, cy - innerGlowR, innerGlowR * 2, innerGlowR * 2);
+    ctx.restore();
+
+    // ── White inner mini-rings orbiting the core ──
     this.core.innerRings.forEach(ir => {
       const segs = 60;
       const pts = [];
@@ -391,13 +413,11 @@ class GyroscopeAnimation {
         p = this._applyGlobalRotation(p, t);
         pts.push(project(p, cx, cy, fov));
       }
-
       for (let i = 0; i < pts.length - 1; i++) {
         const p0 = pts[i];
         const p1 = pts[i + 1];
         const depthFade = 0.3 + 0.7 * ((p0.z + scale * 0.3) / (scale * 0.6));
         const alpha = ir.opacity * b * Math.max(0.06, Math.min(1, depthFade));
-
         ctx.beginPath();
         ctx.moveTo(p0.x, p0.y);
         ctx.lineTo(p1.x, p1.y);
@@ -407,58 +427,36 @@ class GyroscopeAnimation {
       }
     });
 
-    // Orange sphere — heartbeat ignites from within (orange → hotter orange-white)
+    // ── Layer 4: The sun sphere — white-yellow center → orange → deep red edge ──
     const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    // At rest: flat matte orange. On beat: center shifts toward bright white-orange
-    const centerR = Math.round(255);
-    const centerG = Math.round(65 + hbPulse * 120);   // 65 → 185 (toward warm white)
-    const centerB = Math.round(15 + hbPulse * 80);    // 15 → 95
-    const midR = 255;
-    const midG = Math.round(55 + hbPulse * 60);       // 55 → 115
-    const midB = Math.round(0 + hbPulse * 30);        // 0 → 30
-    const edgeR = 230;
-    const edgeG = Math.round(45 + hbPulse * 30);
-    const edgeB = Math.round(0 + hbPulse * 10);
-
-    grad.addColorStop(0, `rgba(${centerR},${centerG},${centerB},${0.95 * b})`);
-    grad.addColorStop(0.7, `rgba(${midR},${midG},${midB},${0.92 * b})`);
-    grad.addColorStop(1, `rgba(${edgeR},${edgeG},${edgeB},${0.85 * b})`);
+    // Heartbeat shifts everything hotter/brighter
+    const h = hbPulse;
+    // Center: warm white-yellow (at rest) → blazing white (on beat)
+    grad.addColorStop(0,    `rgba(255,${Math.round(220 + h * 35)},${Math.round(140 + h * 80)},${b})`);
+    // Inner: bright yellow-orange
+    grad.addColorStop(0.25, `rgba(255,${Math.round(180 + h * 40)},${Math.round(60 + h * 50)},${b})`);
+    // Mid: vivid orange
+    grad.addColorStop(0.55, `rgba(255,${Math.round(120 + h * 30)},${Math.round(10 + h * 20)},${0.97 * b})`);
+    // Outer: deep orange-red
+    grad.addColorStop(0.8,  `rgba(${Math.round(240 + h * 15)},${Math.round(60 + h * 20)},${Math.round(0 + h * 5)},${0.95 * b})`);
+    // Edge: deep red
+    grad.addColorStop(1,    `rgba(${Math.round(180 + h * 30)},${Math.round(20 + h * 10)},0,${0.9 * b})`);
 
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, TAU);
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // Subtle shadow on bottom-right — visible when dimming, fades on ignition
-    const shadowStrength = (1 - hbPulse) * 0.25 * b;
-    if (shadowStrength > 0.01) {
-      ctx.save();
-      // Dark overlay offset toward bottom-right, clipped to the sphere
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, TAU);
-      ctx.clip();
-      const shOff = r * 0.35;
-      const shGrad = ctx.createRadialGradient(
-        cx - shOff, cy - shOff, r * 0.4,
-        cx + shOff * 0.5, cy + shOff * 0.5, r * 1.1
-      );
-      shGrad.addColorStop(0, 'rgba(0,0,0,0)');
-      shGrad.addColorStop(0.6, `rgba(0,0,0,${shadowStrength * 0.15})`);
-      shGrad.addColorStop(1, `rgba(0,0,0,${shadowStrength * 0.4})`);
-      ctx.fillStyle = shGrad;
-      ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
-      ctx.restore();
-    }
-
-    // Hot-white bloom overlay on peak ignition
-    if (hbPulse > 0.1) {
+    // ── Layer 5: Hot white-yellow center bloom on ignition ──
+    if (hbPulse > 0.05) {
       ctx.save();
       ctx.globalCompositeOperation = 'lighter';
-      const hotR = r * 0.7;
+      const hotR = r * 0.85;
       const hotGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, hotR);
-      hotGrad.addColorStop(0, `rgba(255,220,180,${0.25 * hbPulse * b})`);
-      hotGrad.addColorStop(0.5, `rgba(255,120,50,${0.1 * hbPulse * b})`);
-      hotGrad.addColorStop(1, 'rgba(255,60,10,0)');
+      hotGrad.addColorStop(0, `rgba(255,255,230,${0.35 * h * b})`);
+      hotGrad.addColorStop(0.3, `rgba(255,220,120,${0.2 * h * b})`);
+      hotGrad.addColorStop(0.6, `rgba(255,140,40,${0.08 * h * b})`);
+      hotGrad.addColorStop(1, 'rgba(255,80,0,0)');
       ctx.fillStyle = hotGrad;
       ctx.beginPath();
       ctx.arc(cx, cy, hotR, 0, TAU);
@@ -638,11 +636,11 @@ class GyroscopeAnimation {
       const innerR = Math.max(0, radius - ringWidth);
 
       const grad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, radius);
-      grad.addColorStop(0, `rgba(255,80,20,0)`);
-      grad.addColorStop(0.3, `rgba(255,70,15,${alpha * 0.5})`);
-      grad.addColorStop(0.6, `rgba(255,255,255,${alpha})`);
-      grad.addColorStop(0.85, `rgba(255,70,15,${alpha * 0.5})`);
-      grad.addColorStop(1, `rgba(255,55,0,0)`);
+      grad.addColorStop(0, `rgba(180,20,0,0)`);
+      grad.addColorStop(0.2, `rgba(200,40,0,${alpha * 0.4})`);
+      grad.addColorStop(0.5, `rgba(255,120,30,${alpha})`);
+      grad.addColorStop(0.8, `rgba(200,40,0,${alpha * 0.4})`);
+      grad.addColorStop(1, `rgba(140,10,0,0)`);
 
       ctx.fillStyle = grad;
       ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
