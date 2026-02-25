@@ -135,13 +135,29 @@ class GyroscopeAnimation {
         color: W, opacity: 0.10,
         dashPattern: [2, 3], bloomDelay: 1200,
       },
+
+      // Wide outer rings — fill full page width
+      {
+        radius: 0.58, segments: 220, lineWidth: 0.4,
+        tiltX: PI * 0.12, tiltY: PI * 0.08, tiltZ: PI * 0.35,
+        spinAxis: 'z', spinSpeed: 0.00012, spinAngle: 0,
+        color: W, opacity: 0.07,
+        dashPattern: [2, 6], bloomDelay: 1400,
+      },
+      {
+        radius: 0.72, segments: 260, lineWidth: 0.3,
+        tiltX: PI * 0.3, tiltY: PI * 0.18, tiltZ: 0,
+        spinAxis: 'y', spinSpeed: -0.0001, spinAngle: 0,
+        color: W, opacity: 0.05,
+        dashPattern: [1, 5], bloomDelay: 1600,
+      },
     ];
   }
 
   _initParticles() {
     this.particles = [];
     const W = [255, 255, 255];
-    const particlesPerRing = [10, 8, 8, 7, 6, 5, 4, 4];
+    const particlesPerRing = [10, 8, 8, 7, 6, 5, 4, 4, 5, 6];
 
     for (let r = 0; r < this.rings.length; r++) {
       const count = particlesPerRing[r] || 4;
@@ -483,13 +499,13 @@ class GyroscopeAnimation {
     ctx.restore();
   }
 
-  /* ── Connections (white) ── */
+  /* ── Connections (white lines between nearby particles) ── */
   _drawConnections(ctx, t, cx, cy, scale, fov) {
     if (this.bloom < 0.3) return;
 
     const positions = [];
     this.particles.forEach(p => {
-      if (p.bloom < 0.3) return;
+      if (p.bloom < 0.2) return;
       let pt;
       if (p.ringIdx >= 0) {
         const ring = this.rings[p.ringIdx];
@@ -498,10 +514,11 @@ class GyroscopeAnimation {
         pt = { x: p.x * scale, y: p.y * scale, z: p.z * scale };
       }
       pt = this._applyGlobalRotation(pt, t);
-      positions.push(project(pt, cx, cy, fov));
+      const proj = project(pt, cx, cy, fov);
+      positions.push({ ...proj, bloom: p.bloom });
     });
 
-    const maxDist = scale * 0.13;
+    const maxDist = scale * 0.18;
     const maxDistSq = maxDist * maxDist;
 
     ctx.save();
@@ -515,13 +532,15 @@ class GyroscopeAnimation {
         if (distSq > maxDistSq) continue;
 
         const dist = Math.sqrt(distSq);
-        const alpha = (1 - dist / maxDist) * 0.05 * this.bloom;
+        const proximity = 1 - dist / maxDist;
+        const depthAvg = (positions[i].s + positions[j].s) / 2;
+        const alpha = proximity * proximity * 0.12 * this.bloom * Math.min(positions[i].bloom, positions[j].bloom) * depthAvg;
 
         ctx.beginPath();
         ctx.moveTo(positions[i].x, positions[i].y);
         ctx.lineTo(positions[j].x, positions[j].y);
         ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
-        ctx.lineWidth = 0.4;
+        ctx.lineWidth = 0.3 + proximity * 0.4;
         ctx.stroke();
       }
     }
@@ -574,7 +593,7 @@ class GyroscopeAnimation {
     this._drawCore(ctx, t, cx, cy, scale, this.fov);
 
     // Vignette
-    const vig = ctx.createRadialGradient(cx, cy, scale * 0.15, cx, cy, Math.max(w, h) * 0.72);
+    const vig = ctx.createRadialGradient(cx, cy, scale * 0.2, cx, cy, Math.max(w, h) * 0.85);
     vig.addColorStop(0, 'rgba(0,0,0,0)');
     vig.addColorStop(1, 'rgba(0,0,0,0.4)');
     ctx.fillStyle = vig;
