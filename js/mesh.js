@@ -1,13 +1,35 @@
 /* ═══════════════════════════════════════
-   mesh.js — Arrival-inspired logogram
-   Dense black ink ring on pale mist,
-   living, breathing, smoky
-   Cursor acts as gentle wind gusts
+   mesh.js — 3D Gyroscopic Holon
+   White lines + white glowing dots,
+   flat matte orange core sphere.
    ═══════════════════════════════════════ */
 
 import { observeCanvas, prefersReducedMotion } from './main.js';
 
-class MeshAnimation {
+const TAU = Math.PI * 2;
+const PI  = Math.PI;
+
+/* ── 3D Math helpers ── */
+
+function rotateX(p, a) {
+  const c = Math.cos(a), s = Math.sin(a);
+  return { x: p.x, y: p.y * c - p.z * s, z: p.y * s + p.z * c };
+}
+function rotateY(p, a) {
+  const c = Math.cos(a), s = Math.sin(a);
+  return { x: p.x * c + p.z * s, y: p.y, z: -p.x * s + p.z * c };
+}
+function rotateZ(p, a) {
+  const c = Math.cos(a), s = Math.sin(a);
+  return { x: p.x * c - p.y * s, y: p.x * s + p.y * c, z: p.z };
+}
+
+function project(p, cx, cy, fov) {
+  const scale = fov / (fov + p.z);
+  return { x: cx + p.x * scale, y: cy + p.y * scale, s: scale, z: p.z };
+}
+
+class GyroscopeAnimation {
   constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
@@ -16,40 +38,31 @@ class MeshAnimation {
     this.startTime = 0;
     this.dpr = Math.min(window.devicePixelRatio || 1, 2);
 
+    // Glow buffer
     this.buffer = document.createElement('canvas');
     this.bCtx = this.buffer.getContext('2d');
 
     // Mouse tracking
     this.mouseX = 0;
     this.mouseY = 0;
-    this.prevMouseX = 0;
-    this.prevMouseY = 0;
-    this.smoothX = 0;
-    this.smoothY = 0;
-    this.mouseVelX = 0;
-    this.mouseVelY = 0;
     this.mouseInCanvas = false;
+    this.tiltX = 0;
+    this.tiltY = 0;
 
-    // Ink ring strokes — many overlapping for density
-    this.strokes = [];
-    for (let i = 0; i < 12; i++) {
-      this.strokes.push(this.createStroke(i));
-    }
+    this._initRings();
+    this._initParticles();
+    this._initCore();
 
-    // Ink marks — organic splotches branching off the ring
-    this.marks = [];
-    const markCount = 5 + Math.floor(Math.random() * 4);
-    for (let i = 0; i < markCount; i++) {
-      this.marks.push(this.createMark(i, markCount));
-    }
+    this.bloom = 0;
+    this.fov = 600;
 
     this.resize();
     window.addEventListener('resize', () => this.resize());
 
     canvas.addEventListener('mousemove', (e) => {
       const rect = canvas.getBoundingClientRect();
-      this.mouseX = e.clientX - rect.left;
-      this.mouseY = e.clientY - rect.top;
+      this.mouseX = (e.clientX - rect.left) / rect.width - 0.5;
+      this.mouseY = (e.clientY - rect.top) / rect.height - 0.5;
       this.mouseInCanvas = true;
     });
     canvas.addEventListener('mouseleave', () => {
@@ -57,138 +70,133 @@ class MeshAnimation {
     });
   }
 
-  createStroke(index) {
-    const group = index < 5 ? 'core' : index < 9 ? 'mid' : 'outer';
-    const baseRadius = group === 'core'
-      ? 0.175 + Math.random() * 0.015
-      : group === 'mid'
-        ? 0.185 + Math.random() * 0.02
-        : 0.20 + Math.random() * 0.025;
+  _initRings() {
+    // All rings are white — varying opacity and line weight for depth
+    const W = [255, 255, 255];
+    this.rings = [
+      // Inner rings — tight, fast
+      {
+        radius: 0.16, segments: 100, lineWidth: 1.8,
+        tiltX: 0.3, tiltY: 0, tiltZ: 0,
+        spinAxis: 'y', spinSpeed: 0.0012, spinAngle: 0,
+        color: W, opacity: 0.6,
+        dashPattern: null, bloomDelay: 200,
+      },
+      {
+        radius: 0.21, segments: 100, lineWidth: 1.5,
+        tiltX: PI * 0.42, tiltY: PI * 0.15, tiltZ: 0,
+        spinAxis: 'x', spinSpeed: -0.001, spinAngle: 0,
+        color: W, opacity: 0.45,
+        dashPattern: null, bloomDelay: 350,
+      },
+      {
+        radius: 0.19, segments: 100, lineWidth: 1.0,
+        tiltX: PI * 0.52, tiltY: 0, tiltZ: PI * 0.3,
+        spinAxis: 'z', spinSpeed: 0.0009, spinAngle: 0,
+        color: W, opacity: 0.3,
+        dashPattern: [4, 5], bloomDelay: 500,
+      },
 
-    const harmonics = [];
-    const n = 3 + Math.floor(Math.random() * 5);
-    for (let h = 0; h < n; h++) {
-      harmonics.push({
-        freq: 1 + Math.floor(Math.random() * 8),
-        amp: group === 'core'
-          ? 0.005 + Math.random() * 0.02
-          : 0.01 + Math.random() * 0.05,
-        phase: Math.random() * Math.PI * 2,
-        drift: (Math.random() - 0.5) * 0.0003,
-      });
-    }
+      // Middle rings
+      {
+        radius: 0.30, segments: 140, lineWidth: 1.1,
+        tiltX: 0.15, tiltY: PI * 0.25, tiltZ: 0,
+        spinAxis: 'y', spinSpeed: 0.0007, spinAngle: 0,
+        color: W, opacity: 0.28,
+        dashPattern: null, bloomDelay: 650,
+      },
+      {
+        radius: 0.34, segments: 140, lineWidth: 0.9,
+        tiltX: PI * 0.35, tiltY: 0, tiltZ: PI * 0.5,
+        spinAxis: 'x', spinSpeed: -0.0006, spinAngle: 0,
+        color: W, opacity: 0.22,
+        dashPattern: [5, 7], bloomDelay: 800,
+      },
+      {
+        radius: 0.28, segments: 120, lineWidth: 0.8,
+        tiltX: PI * 0.6, tiltY: PI * 0.4, tiltZ: 0,
+        spinAxis: 'z', spinSpeed: 0.0008, spinAngle: 0,
+        color: W, opacity: 0.18,
+        dashPattern: [3, 4], bloomDelay: 750,
+      },
 
-    const thicknessHarmonics = [];
-    for (let h = 0; h < 3; h++) {
-      thicknessHarmonics.push({
-        freq: 1 + Math.floor(Math.random() * 5),
-        amp: 0.3 + Math.random() * 0.7,
-        phase: Math.random() * Math.PI * 2,
-        drift: (Math.random() - 0.5) * 0.0004,
-      });
-    }
-
-    return {
-      group,
-      baseRadius,
-      harmonics,
-      thicknessHarmonics,
-      baseThickness: group === 'core'
-        ? 6 + Math.random() * 8
-        : group === 'mid'
-          ? 3 + Math.random() * 5
-          : 1 + Math.random() * 2.5,
-      opacity: group === 'core'
-        ? 0.5 + Math.random() * 0.35
-        : group === 'mid'
-          ? 0.2 + Math.random() * 0.25
-          : 0.06 + Math.random() * 0.1,
-      rotation: Math.random() * Math.PI * 2,
-      rotationSpeed: (Math.random() - 0.5) * 0.0005,
-      // Wind response — how much this stroke reacts to cursor gusts
-      // Outer strokes are lighter, blow more easily
-      windWeight: group === 'core' ? 0.3 + Math.random() * 0.3
-        : group === 'mid' ? 0.6 + Math.random() * 0.4
-        : 0.8 + Math.random() * 0.5,
-      // Per-stroke displacement from wind (smoothed)
-      windOffsetX: 0,
-      windOffsetY: 0,
-      windRotOffset: 0,
-      bloom: 0,
-      bloomTarget: 0.8 + Math.random() * 0.2,
-      bloomSpeed: 0.0005 + Math.random() * 0.0005,
-      bleed: 0,
-      bleedRate: 0.0000012 + Math.random() * 0.0000015,
-    };
+      // Outer rings — large, slower, ethereal
+      {
+        radius: 0.42, segments: 180, lineWidth: 0.7,
+        tiltX: 0.1, tiltY: PI * 0.1, tiltZ: PI * 0.2,
+        spinAxis: 'y', spinSpeed: 0.0004, spinAngle: 0,
+        color: W, opacity: 0.14,
+        dashPattern: [2, 4], bloomDelay: 1000,
+      },
+      {
+        radius: 0.46, segments: 180, lineWidth: 0.5,
+        tiltX: PI * 0.45, tiltY: PI * 0.3, tiltZ: 0,
+        spinAxis: 'x', spinSpeed: -0.00035, spinAngle: 0,
+        color: W, opacity: 0.10,
+        dashPattern: [2, 3], bloomDelay: 1200,
+      },
+    ];
   }
 
-  createMark(index, total) {
-    const angle = (index / total) * Math.PI * 2 + (Math.random() - 0.5) * 0.8;
-    const outward = Math.random() > 0.2;
+  _initParticles() {
+    this.particles = [];
+    const W = [255, 255, 255];
+    const particlesPerRing = [10, 8, 8, 7, 6, 5, 4, 4];
 
-    const arcSpan = 0.15 + Math.random() * 0.5;
-    const radiusOffset = outward
-      ? 0.01 + Math.random() * 0.06
-      : -(0.01 + Math.random() * 0.04);
+    for (let r = 0; r < this.rings.length; r++) {
+      const count = particlesPerRing[r] || 4;
+      for (let i = 0; i < count; i++) {
+        this.particles.push({
+          ringIdx: r,
+          angle: Math.random() * TAU,
+          speed: (0.001 + Math.random() * 0.0015) * (r < 3 ? 1.3 : 0.8),
+          size: 1.0 + Math.random() * 1.8,
+          baseAlpha: 0.35 + Math.random() * 0.45,
+          color: W,
+          bloomDelay: this.rings[r].bloomDelay + 200 + Math.random() * 300,
+          bloom: 0,
+        });
+      }
+    }
 
-    const harmonics = [];
-    for (let h = 0; h < 2 + Math.floor(Math.random() * 3); h++) {
-      harmonics.push({
-        freq: 1 + Math.floor(Math.random() * 6),
-        amp: 0.01 + Math.random() * 0.04,
-        phase: Math.random() * Math.PI * 2,
-        drift: (Math.random() - 0.5) * 0.0004,
+    // Free-floating ambient dust — all white
+    for (let i = 0; i < 25; i++) {
+      this.particles.push({
+        ringIdx: -1,
+        x: (Math.random() - 0.5) * 1.1,
+        y: (Math.random() - 0.5) * 1.1,
+        z: (Math.random() - 0.5) * 0.5,
+        vx: (Math.random() - 0.5) * 0.00005,
+        vy: (Math.random() - 0.5) * 0.00005,
+        vz: (Math.random() - 0.5) * 0.00003,
+        size: 0.5 + Math.random() * 1.0,
+        baseAlpha: 0.1 + Math.random() * 0.15,
+        color: W,
+        bloomDelay: 1500 + Math.random() * 600,
+        bloom: 0,
       });
     }
+  }
 
-    const thicknessHarmonics = [];
-    for (let h = 0; h < 2; h++) {
-      thicknessHarmonics.push({
-        freq: 1 + Math.floor(Math.random() * 4),
-        amp: 0.4 + Math.random() * 0.6,
-        phase: Math.random() * Math.PI * 2,
-        drift: (Math.random() - 0.5) * 0.0005,
-      });
-    }
-
-    const type = Math.random();
-    let taperIn, taperOut;
-    if (type < 0.4) {
-      taperIn = 0; taperOut = 1;
-    } else if (type < 0.7) {
-      taperIn = 1; taperOut = 1;
-    } else {
-      taperIn = 0.3; taperOut = 0.3;
-    }
-
-    return {
-      angle,
-      arcSpan,
-      radiusBase: 0.19 + radiusOffset,
-      harmonics,
-      thicknessHarmonics,
-      baseThickness: 2 + Math.random() * 6,
-      opacity: 0.2 + Math.random() * 0.4,
-      taperIn,
-      taperOut,
-      rotSpeed: (Math.random() - 0.5) * 0.000012,
-      breathPhase: Math.random() * Math.PI * 2,
-      breathSpeed: 0.00015 + Math.random() * 0.00025,
-      breathAmp: 0.15 + Math.random() * 0.25,
-      windWeight: 0.7 + Math.random() * 0.6,
-      windOffsetX: 0,
-      windOffsetY: 0,
+  _initCore() {
+    this.core = {
+      radius: 0.06,
+      pulsePhase: 0,
       bloom: 0,
-      bloomTarget: 0.8 + Math.random() * 0.2,
-      bloomDelay: 2500 + Math.random() * 3500,
-      bloomSpeed: 0.0004 + Math.random() * 0.0004,
+      bloomDelay: 0,
+      // White inner mini-rings orbiting the core
+      innerRings: [
+        { radius: 0.085, tiltX: 0.8, tiltY: 0, speed: 0.003, angle: 0, opacity: 0.35, width: 0.8 },
+        { radius: 0.105, tiltX: 0, tiltY: 1.2, speed: -0.0025, angle: PI * 0.7, opacity: 0.25, width: 0.7 },
+        { radius: 0.095, tiltX: 1.4, tiltY: 0.5, speed: 0.002, angle: PI * 1.3, opacity: 0.2, width: 0.6 },
+      ],
     };
   }
 
   resize() {
-    const rect = this.canvas.parentElement.getBoundingClientRect();
-    this.w = rect.width;
-    this.h = rect.height;
+    const parent = this.canvas.parentElement;
+    this.w = parent.offsetWidth;
+    this.h = parent.offsetHeight;
     this.canvas.width = this.w * this.dpr;
     this.canvas.height = this.h * this.dpr;
     this.canvas.style.width = this.w + 'px';
@@ -200,82 +208,328 @@ class MeshAnimation {
     this.bCtx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
   }
 
-  drawStrokePath(bCtx, points, thickness, alpha, color) {
-    if (alpha < 0.005) return;
-    bCtx.beginPath();
-    for (let i = 0; i < points.length; i++) {
-      const p = points[i];
-      const a = p.angle;
-      const nx = -Math.sin(a), ny = Math.cos(a);
-      const ox = p.x + nx * p.thick * thickness * 0.5;
-      const oy = p.y + ny * p.thick * thickness * 0.5;
-      if (i === 0) bCtx.moveTo(ox, oy); else bCtx.lineTo(ox, oy);
-    }
-    for (let i = points.length - 1; i >= 0; i--) {
-      const p = points[i];
-      const a = p.angle;
-      const nx = -Math.sin(a), ny = Math.cos(a);
-      bCtx.lineTo(p.x - nx * p.thick * thickness * 0.5, p.y - ny * p.thick * thickness * 0.5);
-    }
-    bCtx.closePath();
-    bCtx.fillStyle = `rgba(${color},${alpha})`;
-    bCtx.fill();
+  /* ── Get 3D position on a ring ── */
+  _ringPoint3D(ring, angle, scale) {
+    const r = ring.radius * scale;
+    let p = { x: Math.cos(angle) * r, y: Math.sin(angle) * r, z: 0 };
+    p = rotateX(p, ring.tiltX);
+    p = rotateY(p, ring.tiltY);
+    if (ring.tiltZ) p = rotateZ(p, ring.tiltZ);
+    if (ring.spinAxis === 'x') p = rotateX(p, ring.spinAngle);
+    else if (ring.spinAxis === 'y') p = rotateY(p, ring.spinAngle);
+    else p = rotateZ(p, ring.spinAngle);
+    return p;
   }
 
-  drawMark(bCtx, mark, t, cx, cy, scale) {
-    if (mark.bloom < 0.01) return;
+  /* ── Core inner ring 3D point ── */
+  _coreRingPoint3D(ir, angle, scale) {
+    const r = ir.radius * scale;
+    let p = { x: Math.cos(angle) * r, y: Math.sin(angle) * r, z: 0 };
+    p = rotateX(p, ir.tiltX);
+    p = rotateY(p, ir.tiltY);
+    p = rotateY(p, ir.angle);
+    p = rotateX(p, ir.angle * 0.3);
+    return p;
+  }
 
-    const breath = Math.sin(t * mark.breathSpeed + mark.breathPhase) * 0.5 + 0.5;
-    const breathScale = 1 - mark.breathAmp + breath * mark.breathAmp;
+  /* ── Update ── */
+  _update(t, dt, elapsed) {
+    if (this.bloom < 1) {
+      this.bloom = Math.min(1, this.bloom + dt * 0.0008);
+    }
 
-    const r0 = mark.radiusBase * scale;
-    const startAngle = mark.angle - mark.arcSpan * 0.5;
-    const segments = Math.max(20, Math.floor(mark.arcSpan * 60));
+    if (elapsed > this.core.bloomDelay && this.core.bloom < 1) {
+      this.core.bloom = Math.min(1, this.core.bloom + dt * 0.0012);
+    }
+    this.core.pulsePhase += 0.0008 * dt;
 
-    // Wind displacement for this mark
-    const wdx = mark.windOffsetX;
-    const wdy = mark.windOffsetY;
+    // Core inner rings spin
+    this.core.innerRings.forEach(ir => {
+      ir.angle += ir.speed * dt;
+    });
 
+    // Mouse → tilt
+    if (this.mouseInCanvas) {
+      this.tiltX += (this.mouseY * 0.4 - this.tiltX) * 0.05;
+      this.tiltY += (this.mouseX * 0.4 - this.tiltY) * 0.05;
+    } else {
+      this.tiltX += (0 - this.tiltX) * 0.02;
+      this.tiltY += (0 - this.tiltY) * 0.02;
+    }
+
+    // Ring spins
+    this.rings.forEach(ring => {
+      ring.spinAngle += ring.spinSpeed * dt;
+    });
+
+    // Particles
+    this.particles.forEach(p => {
+      if (elapsed > p.bloomDelay && p.bloom < 1) {
+        p.bloom = Math.min(1, p.bloom + dt * 0.0012);
+      }
+      if (p.ringIdx >= 0) {
+        p.angle = (p.angle + p.speed * dt) % TAU;
+      } else {
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.z += p.vz * dt;
+        if (Math.abs(p.x) > 0.65) p.vx *= -1;
+        if (Math.abs(p.y) > 0.65) p.vy *= -1;
+        if (Math.abs(p.z) > 0.35) p.vz *= -1;
+      }
+    });
+  }
+
+  /* ── Apply global rotation ── */
+  _applyGlobalRotation(p, t) {
+    let pt = p;
+    pt = rotateY(pt, t * 0.00008);
+    pt = rotateX(pt, t * 0.00004);
+    pt = rotateX(pt, this.tiltX);
+    pt = rotateY(pt, this.tiltY);
+    return pt;
+  }
+
+  /* ── Draw ring (white, depth-faded) ── */
+  _drawRing(ctx, ring, t, cx, cy, scale, fov, ringBloom) {
+    if (ringBloom < 0.01) return;
+
+    const segments = ring.segments;
     const points = [];
+
     for (let i = 0; i <= segments; i++) {
-      const frac = i / segments;
-      const angle = startAngle + frac * mark.arcSpan;
-
-      let deform = 0;
-      mark.harmonics.forEach(harm => {
-        deform += Math.sin(angle * harm.freq + harm.phase + t * harm.drift) * harm.amp;
-      });
-
-      const r = r0 * (1 + deform);
-
-      let thickMod = 0.5;
-      mark.thicknessHarmonics.forEach(th => {
-        thickMod += Math.sin(angle * th.freq + th.phase + t * th.drift) * th.amp * 0.3;
-      });
-
-      let taper = 1;
-      if (mark.taperIn > 0 && frac < 0.3) {
-        taper *= Math.pow(frac / 0.3, mark.taperIn);
-      }
-      if (mark.taperOut > 0 && frac > 0.7) {
-        taper *= Math.pow((1 - frac) / 0.3, mark.taperOut);
-      }
-
-      points.push({
-        x: cx + Math.cos(angle) * r + wdx,
-        y: cy + Math.sin(angle) * r + wdy,
-        thick: Math.max(0.1, mark.baseThickness * thickMod * taper * mark.bloom * breathScale),
-        angle,
-      });
+      const angle = (i / segments) * TAU;
+      let p = this._ringPoint3D(ring, angle, scale);
+      p = this._applyGlobalRotation(p, t);
+      points.push(project(p, cx, cy, fov));
     }
 
-    const alpha = mark.opacity * mark.bloom * breathScale;
+    ctx.save();
+    if (ring.dashPattern) ctx.setLineDash(ring.dashPattern);
 
-    this.drawStrokePath(bCtx, points, 2.8, alpha * 0.12, '0,51,70');
-    this.drawStrokePath(bCtx, points, 1.4, alpha * 0.4, '0,51,70');
-    this.drawStrokePath(bCtx, points, 1.0, alpha, '0,51,70');
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const avgZ = (p0.z + p1.z) / 2;
+      const depthFade = 0.2 + 0.8 * ((avgZ + scale * 0.5) / scale);
+      const alpha = ring.opacity * ringBloom * Math.max(0.05, Math.min(1, depthFade));
+      const lineW = ring.lineWidth * (0.4 + 0.6 * p0.s);
+
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.lineTo(p1.x, p1.y);
+      ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+      ctx.lineWidth = lineW;
+      ctx.stroke();
+    }
+
+    ctx.setLineDash([]);
+    ctx.restore();
   }
 
+  /* ── Draw core: flat matte orange sphere ── */
+  _drawCore(ctx, t, cx, cy, scale, fov) {
+    const b = this.core.bloom;
+    if (b < 0.01) return;
+
+    const pulse = Math.sin(this.core.pulsePhase) * 0.06;
+    const r = this.core.radius * scale * (1 + pulse) * b;
+
+    // Soft, subtle outer glow — just a gentle orange haze
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    const glowR = r * 3.5;
+    const glow = ctx.createRadialGradient(cx, cy, r * 0.8, cx, cy, glowR);
+    glow.addColorStop(0, `rgba(255,55,0,${0.08 * b})`);
+    glow.addColorStop(0.5, `rgba(255,55,0,${0.03 * b})`);
+    glow.addColorStop(1, 'rgba(255,55,0,0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(cx - glowR, cy - glowR, glowR * 2, glowR * 2);
+    ctx.restore();
+
+    // White inner mini-rings orbiting the core
+    this.core.innerRings.forEach(ir => {
+      const segs = 60;
+      const pts = [];
+      for (let i = 0; i <= segs; i++) {
+        const a = (i / segs) * TAU;
+        let p = this._coreRingPoint3D(ir, a, scale);
+        p = this._applyGlobalRotation(p, t);
+        pts.push(project(p, cx, cy, fov));
+      }
+
+      for (let i = 0; i < pts.length - 1; i++) {
+        const p0 = pts[i];
+        const p1 = pts[i + 1];
+        const depthFade = 0.3 + 0.7 * ((p0.z + scale * 0.3) / (scale * 0.6));
+        const alpha = ir.opacity * b * Math.max(0.06, Math.min(1, depthFade));
+
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+        ctx.lineWidth = ir.width * (0.5 + 0.5 * p0.s);
+        ctx.stroke();
+      }
+    });
+
+    // Flat matte orange sphere — very gentle gradient, no shiny 3D effect
+    const grad = ctx.createRadialGradient(
+      cx, cy, 0,
+      cx, cy, r
+    );
+    // Flat: nearly uniform color, very subtle edge darkening
+    grad.addColorStop(0, `rgba(255,65,15,${0.95 * b})`);
+    grad.addColorStop(0.7, `rgba(255,55,0,${0.92 * b})`);
+    grad.addColorStop(1, `rgba(230,45,0,${0.85 * b})`);
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, TAU);
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
+  /* ── Draw particles (all white, with white glow) ── */
+  _drawParticles(ctx, t, cx, cy, scale, fov) {
+    const items = [];
+
+    this.particles.forEach(p => {
+      if (p.bloom < 0.01) return;
+
+      let pt;
+      if (p.ringIdx >= 0) {
+        const ring = this.rings[p.ringIdx];
+        pt = this._ringPoint3D(ring, p.angle, scale);
+      } else {
+        pt = { x: p.x * scale, y: p.y * scale, z: p.z * scale };
+      }
+
+      pt = this._applyGlobalRotation(pt, t);
+      const proj = project(pt, cx, cy, fov);
+
+      items.push({
+        x: proj.x, y: proj.y, z: proj.z, s: proj.s,
+        size: p.size * proj.s,
+        alpha: p.baseAlpha * p.bloom,
+      });
+    });
+
+    items.sort((a, b) => b.z - a.z);
+
+    items.forEach(item => {
+      const depthFade = 0.2 + 0.8 * Math.max(0, Math.min(1, (item.z + scale * 0.5) / scale));
+      const alpha = item.alpha * depthFade;
+      const sz = Math.max(0.5, item.size);
+
+      // White glow
+      const gRad = Math.max(1, sz * 5);
+      const grad = ctx.createRadialGradient(item.x, item.y, 0, item.x, item.y, gRad);
+      grad.addColorStop(0, `rgba(255,255,255,${alpha * 0.35})`);
+      grad.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(item.x - gRad, item.y - gRad, gRad * 2, gRad * 2);
+
+      // White dot
+      ctx.beginPath();
+      ctx.arc(item.x, item.y, sz, 0, TAU);
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.fill();
+    });
+  }
+
+  /* ── HUD ── */
+  _drawHUD(ctx, cx, cy, scale) {
+    const a = this.bloom;
+    if (a < 0.01) return;
+
+    ctx.save();
+
+    // Crosshair
+    const cl = scale * 0.55;
+    ctx.strokeStyle = `rgba(255,255,255,${0.025 * a})`;
+    ctx.lineWidth = 0.4;
+    ctx.beginPath();
+    ctx.moveTo(cx - cl, cy); ctx.lineTo(cx + cl, cy);
+    ctx.moveTo(cx, cy - cl); ctx.lineTo(cx, cy + cl);
+    ctx.stroke();
+
+    // Tick marks
+    const tr = scale * 0.50;
+    const tickCount = 96;
+    for (let i = 0; i < tickCount; i++) {
+      const ang = (i / tickCount) * TAU;
+      const isMajor = i % 6 === 0;
+      const len = isMajor ? scale * 0.016 : scale * 0.008;
+      const alpha = isMajor ? 0.05 : 0.025;
+      ctx.strokeStyle = `rgba(255,255,255,${alpha * a})`;
+      ctx.lineWidth = isMajor ? 0.5 : 0.3;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(ang) * tr, cy + Math.sin(ang) * tr);
+      ctx.lineTo(cx + Math.cos(ang) * (tr + len), cy + Math.sin(ang) * (tr + len));
+      ctx.stroke();
+    }
+
+    // Guide circles
+    ctx.strokeStyle = `rgba(255,255,255,${0.02 * a})`;
+    ctx.lineWidth = 0.3;
+    ctx.setLineDash([2, 6]);
+    [0.16, 0.30, 0.44].forEach(r => {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * scale, 0, TAU);
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+
+    ctx.restore();
+  }
+
+  /* ── Connections (white) ── */
+  _drawConnections(ctx, t, cx, cy, scale, fov) {
+    if (this.bloom < 0.3) return;
+
+    const positions = [];
+    this.particles.forEach(p => {
+      if (p.bloom < 0.3) return;
+      let pt;
+      if (p.ringIdx >= 0) {
+        const ring = this.rings[p.ringIdx];
+        pt = this._ringPoint3D(ring, p.angle, scale);
+      } else {
+        pt = { x: p.x * scale, y: p.y * scale, z: p.z * scale };
+      }
+      pt = this._applyGlobalRotation(pt, t);
+      positions.push(project(pt, cx, cy, fov));
+    });
+
+    const maxDist = scale * 0.13;
+    const maxDistSq = maxDist * maxDist;
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+
+    for (let i = 0; i < positions.length; i++) {
+      for (let j = i + 1; j < positions.length; j++) {
+        const dx = positions[i].x - positions[j].x;
+        const dy = positions[i].y - positions[j].y;
+        const distSq = dx * dx + dy * dy;
+        if (distSq > maxDistSq) continue;
+
+        const dist = Math.sqrt(distSq);
+        const alpha = (1 - dist / maxDist) * 0.05 * this.bloom;
+
+        ctx.beginPath();
+        ctx.moveTo(positions[i].x, positions[i].y);
+        ctx.lineTo(positions[j].x, positions[j].y);
+        ctx.strokeStyle = `rgba(255,255,255,${alpha})`;
+        ctx.lineWidth = 0.4;
+        ctx.stroke();
+      }
+    }
+
+    ctx.restore();
+  }
+
+  /* ── Main draw ── */
   draw(t) {
     const { ctx, bCtx, w, h } = this;
     const cx = w / 2;
@@ -284,191 +538,55 @@ class MeshAnimation {
     const dt = this.time ? Math.min(t - this.time, 50) : 16;
     const elapsed = t - this.startTime;
 
-    // ── Smooth mouse & compute velocity ──
-    this.smoothX += (this.mouseX - this.smoothX) * 0.08;
-    this.smoothY += (this.mouseY - this.smoothY) * 0.08;
-    const mx = this.smoothX;
-    const my = this.smoothY;
+    this._update(t, dt, elapsed);
 
-    // Mouse velocity — any movement creates wind, speed determines intensity
-    this.mouseVelX = (mx - this.prevMouseX);
-    this.mouseVelY = (my - this.prevMouseY);
-    this.prevMouseX = mx;
-    this.prevMouseY = my;
-
-    const velMag = Math.hypot(this.mouseVelX, this.mouseVelY);
-    const mouseDist = Math.hypot(mx - cx, my - cy);
-    const ringR = 0.19 * scale;
-
-    // ── Compute wind force ──
-    // Any cursor movement near the ring creates wind. Speed = intensity.
-    const proximityFalloff = Math.max(0, 1 - mouseDist / (ringR * 3));
-    const gustStrength = this.mouseInCanvas ? velMag * proximityFalloff : 0;
-
-    // Wind direction — even tiny movements have a direction
-    const windDirX = velMag > 0.1 ? this.mouseVelX / velMag : 0;
-    const windDirY = velMag > 0.1 ? this.mouseVelY / velMag : 0;
-
-    // ── PALE BACKGROUND ──
-    ctx.fillStyle = '#FFFEDF';
+    // Clear
+    ctx.fillStyle = '#0C0C0E';
     ctx.fillRect(0, 0, w, h);
 
-    // Light fog — strict palette colors only
-    const fogs = [
-      [0.30, 0.35, 0.45, 0.00010, 0.0, 254, 218, 179],
-      [0.70, 0.30, 0.40, 0.00014, 2.1, 254, 218, 179],
-      [0.50, 0.68, 0.42, 0.00012, 4.0, 204, 217, 216],
-      [0.25, 0.60, 0.35, 0.00016, 1.5, 204, 217, 216],
-    ];
-    fogs.forEach(([fx, fy, fr, fs, fp, r, g, b]) => {
-      const ox = Math.sin(t * fs + fp) * w * 0.03;
-      const oy = Math.cos(t * fs * 0.7 + fp) * h * 0.02;
-      const grad = ctx.createRadialGradient(fx * w + ox, fy * h + oy, 0, fx * w + ox, fy * h + oy, fr * scale);
-      grad.addColorStop(0, `rgba(${r},${g},${b},0.6)`);
-      grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
+    // Ring bloom
+    const ringBlooms = this.rings.map(ring => {
+      if (elapsed < ring.bloomDelay) return 0;
+      return Math.min(1, (elapsed - ring.bloomDelay) * 0.0008);
     });
 
-    // ── INK ON BUFFER ──
+    // Glow pass
     bCtx.clearRect(0, 0, w, h);
+    this._drawCore(bCtx, t, cx, cy, scale, this.fov);
+    this._drawParticles(bCtx, t, cx, cy, scale, this.fov);
 
-    // Ring strokes
-    this.strokes.forEach((stroke, si) => {
-      const bloomDelay = si * 400;
-      if (elapsed > bloomDelay) {
-        stroke.bloom = Math.min(stroke.bloom + dt * stroke.bloomSpeed, stroke.bloomTarget);
-      }
-      stroke.bleed += dt * stroke.bleedRate;
-
-      // Wind accumulates — each gust adds displacement that decays very slowly
-      // Like real smoke: once pushed, it drifts and only gradually settles
-      const windForceX = windDirX * gustStrength * stroke.windWeight * 0.8;
-      const windForceY = windDirY * gustStrength * stroke.windWeight * 0.8;
-      stroke.windOffsetX += windForceX * 0.05;
-      stroke.windOffsetY += windForceY * 0.05;
-      // Very slow decay — smoke lingers
-      stroke.windOffsetX *= 0.997;
-      stroke.windOffsetY *= 0.997;
-      // Soft cap so it doesn't fly off screen
-      const maxDrift = ringR * 0.5;
-      const driftMag = Math.hypot(stroke.windOffsetX, stroke.windOffsetY);
-      if (driftMag > maxDrift) {
-        stroke.windOffsetX *= maxDrift / driftMag;
-        stroke.windOffsetY *= maxDrift / driftMag;
-      }
-
-      // Rotational wind — accumulates too
-      const windTorque = (windDirX * 0.5 - windDirY * 0.5) * gustStrength * stroke.windWeight * 0.00008;
-      stroke.windRotOffset += windTorque;
-      stroke.windRotOffset *= 0.998; // slow decay
-
-      stroke.rotation += (stroke.rotationSpeed + stroke.windRotOffset) * dt;
-
-      if (stroke.bloom < 0.01) return;
-
-      const r0 = (stroke.baseRadius + stroke.bleed) * scale;
-      const segments = 180;
-
-      // Per-point wind displacement: points closer to cursor get pushed more
-      const points = [];
-      for (let i = 0; i <= segments; i++) {
-        const frac = i / segments;
-        const angle = frac * Math.PI * 2 + stroke.rotation;
-
-        let deform = 0;
-        stroke.harmonics.forEach(harm => {
-          deform += Math.sin(angle * harm.freq + harm.phase + t * harm.drift) * harm.amp;
-        });
-
-        const breath = Math.sin(t * 0.0003 + si * 0.6) * 0.008;
-        const r = r0 * (1 + deform + breath);
-
-        // Point position before wind
-        let px = cx + Math.cos(angle) * r;
-        let py = cy + Math.sin(angle) * r;
-
-        // Local wind push — points near cursor get displaced
-        if (this.mouseInCanvas && gustStrength > 0.05) {
-          const distToMouse = Math.hypot(px - mx, py - my);
-          const localInfluence = Math.max(0, 1 - distToMouse / (ringR * 1.5));
-          if (localInfluence > 0) {
-            const localPush = localInfluence * localInfluence * gustStrength * stroke.windWeight * 1.2;
-            px += windDirX * localPush;
-            py += windDirY * localPush;
-          }
-        }
-
-        // Global stroke displacement
-        px += stroke.windOffsetX;
-        py += stroke.windOffsetY;
-
-        let thickMod = 0.5;
-        stroke.thicknessHarmonics.forEach(th => {
-          thickMod += Math.sin(angle * th.freq + th.phase + t * th.drift) * th.amp * 0.3;
-        });
-
-        points.push({
-          x: px,
-          y: py,
-          thick: Math.max(0.3, stroke.baseThickness * thickMod * stroke.bloom),
-          angle: angle + stroke.rotation,
-        });
-      }
-
-      const alpha = stroke.opacity * stroke.bloom;
-
-      this.drawStrokePath(bCtx, points, 2.8, alpha * 0.15, '0,51,70');
-      this.drawStrokePath(bCtx, points, 1.4, alpha * 0.5, '0,51,70');
-      this.drawStrokePath(bCtx, points, 1.0, alpha, '0,51,70');
-    });
-
-    // ── INK MARKS — logogram features ──
-    this.marks.forEach(mark => {
-      if (elapsed > mark.bloomDelay) {
-        mark.bloom = Math.min(mark.bloom + dt * mark.bloomSpeed, mark.bloomTarget);
-      }
-      mark.angle += mark.rotSpeed * dt;
-
-      // Wind on marks — accumulates, lingers
-      mark.windOffsetX += windDirX * gustStrength * mark.windWeight * 0.06;
-      mark.windOffsetY += windDirY * gustStrength * mark.windWeight * 0.06;
-      mark.windOffsetX *= 0.996;
-      mark.windOffsetY *= 0.996;
-      // Soft cap
-      const markDrift = Math.hypot(mark.windOffsetX, mark.windOffsetY);
-      const markMax = ringR * 0.4;
-      if (markDrift > markMax) {
-        mark.windOffsetX *= markMax / markDrift;
-        mark.windOffsetY *= markMax / markDrift;
-      }
-
-      this.drawMark(bCtx, mark, t, cx, cy, scale);
-    });
-
-    // ── COMPOSITE ──
+    // Blur composite
     ctx.save();
-    ctx.filter = `blur(${Math.max(4, scale * 0.008)}px)`;
-    ctx.globalAlpha = 0.5;
+    ctx.filter = `blur(${Math.max(8, scale * 0.015)}px)`;
+    ctx.globalAlpha = 0.45;
     ctx.drawImage(this.buffer, 0, 0, w * this.dpr, h * this.dpr, 0, 0, w, h);
     ctx.restore();
 
-    ctx.drawImage(this.buffer, 0, 0, w * this.dpr, h * this.dpr, 0, 0, w, h);
+    // Sharp layers
+    this._drawHUD(ctx, cx, cy, scale);
+    this._drawConnections(ctx, t, cx, cy, scale, this.fov);
 
-    // ── VIGNETTE ──
+    this.rings.forEach((ring, i) => {
+      this._drawRing(ctx, ring, t, cx, cy, scale, this.fov, ringBlooms[i]);
+    });
+
+    this._drawParticles(ctx, t, cx, cy, scale, this.fov);
+    this._drawCore(ctx, t, cx, cy, scale, this.fov);
+
+    // Vignette
     const vig = ctx.createRadialGradient(cx, cy, scale * 0.15, cx, cy, Math.max(w, h) * 0.72);
     vig.addColorStop(0, 'rgba(0,0,0,0)');
-    vig.addColorStop(1, 'rgba(0,51,70,0.18)');
+    vig.addColorStop(1, 'rgba(0,0,0,0.4)');
     ctx.fillStyle = vig;
     ctx.fillRect(0, 0, w, h);
 
-    // ── GRAIN ──
+    // Noise
     ctx.save();
-    ctx.globalAlpha = 0.018;
+    ctx.globalAlpha = 0.01;
     ctx.globalCompositeOperation = 'overlay';
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 20; i++) {
       ctx.fillStyle = Math.random() > 0.5 ? '#fff' : '#000';
-      ctx.fillRect(Math.random() * w, Math.random() * h, 1 + Math.random() * 1.5, 1 + Math.random() * 1.5);
+      ctx.fillRect(Math.random() * w, Math.random() * h, 1 + Math.random(), 1 + Math.random());
     }
     ctx.restore();
 
@@ -484,28 +602,55 @@ class MeshAnimation {
   start() {
     if (this.running) return;
     this.running = true;
-    this.startTime = performance.now();
-    this.time = this.startTime;
+    if (!this._everStarted) {
+      this.startTime = performance.now();
+      this.time = this.startTime;
+      this._everStarted = true;
+    } else {
+      const now = performance.now();
+      const pausedDuration = now - this._pausedAt;
+      this.startTime += pausedDuration;
+      this.time = now;
+    }
     requestAnimationFrame(this.loop);
   }
 
-  stop() { this.running = false; }
+  stop() {
+    this._pausedAt = performance.now();
+    this.running = false;
+  }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// ── Init ──
+function initGyroscope() {
   const canvas = document.getElementById('meshCanvas');
   if (!canvas) return;
 
-  const mesh = new MeshAnimation(canvas);
+  const gyro = new GyroscopeAnimation(canvas);
 
   if (prefersReducedMotion) {
-    mesh.startTime = 0;
-    mesh.time = 0;
-    mesh.strokes.forEach(s => { s.bloom = s.bloomTarget; });
-    mesh.marks.forEach(m => { m.bloom = m.bloomTarget; });
-    mesh.draw(3000);
+    gyro.bloom = 1;
+    gyro.core.bloom = 1;
+    gyro.particles.forEach(p => { p.bloom = 1; });
+    gyro.startTime = 0;
+    gyro.time = 0;
+    gyro.draw(3000);
   } else {
-    observeCanvas(canvas, () => mesh.start(), () => mesh.stop());
-    mesh.start();
+    gyro.start();
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        gyro.stop();
+      } else {
+        gyro.start();
+      }
+    });
   }
-});
+}
+
+// Modules are deferred — DOMContentLoaded may have already fired
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initGyroscope);
+} else {
+  initGyroscope();
+}

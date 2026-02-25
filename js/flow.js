@@ -36,23 +36,12 @@ class FlowAnimation {
 
     this.resize();
     window.addEventListener('resize', () => this.resize());
-
-    // Reveal observer
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting && !this.revealed) {
-          this.revealed = true;
-          this.animateReveal();
-        }
-      });
-    }, { threshold: 0.25 });
-    obs.observe(canvas);
   }
 
   resize() {
-    const rect = this.canvas.parentElement.getBoundingClientRect();
-    this.w = rect.width;
-    this.h = Math.min(rect.width * 0.4, 280);
+    const parent = this.canvas.parentElement;
+    this.w = parent.offsetWidth;
+    this.h = Math.min(this.w * 0.4, 280);
     this.canvas.width = this.w * this.dpr;
     this.canvas.height = this.h * this.dpr;
     this.canvas.style.width = this.w + 'px';
@@ -61,6 +50,8 @@ class FlowAnimation {
   }
 
   animateReveal() {
+    if (this.revealed) return;
+    this.revealed = true;
     const dur = 1500;
     const start = performance.now();
     const step = (now) => {
@@ -291,7 +282,7 @@ class FlowAnimation {
 }
 
 // ── Init ──
-document.addEventListener('DOMContentLoaded', () => {
+function _init_flow() {
   const canvas = document.getElementById('flowCanvas');
   if (!canvas) return;
 
@@ -299,8 +290,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (prefersReducedMotion) {
     flow.revealProgress = 1;
+    flow.revealed = true;
     flow.draw(0);
   } else {
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !flow.revealed) {
+          flow.animateReveal();
+        }
+      });
+    }, { threshold: 0.25 });
+    revealObs.observe(canvas);
     observeCanvas(canvas, () => { if (flow.revealed) flow.start(); }, () => flow.stop());
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _init_flow);
+} else {
+  _init_flow();
+}

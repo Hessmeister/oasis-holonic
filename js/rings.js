@@ -16,7 +16,6 @@ class RingsAnimation {
     this.drawProgress = 0;
     this.revealed = false;
 
-    // More rings, alternating rotation direction
     this.rings = [
       { r: 0.44, dash: [6, 8],  speed: 0.00012,  dir:  1, breathDelay: 0,     opacity: 0.18 },
       { r: 0.36, dash: [3, 5],  speed: 0.00025,  dir: -1, breathDelay: -1500,  opacity: 0.30 },
@@ -25,7 +24,6 @@ class RingsAnimation {
       { r: 0.11, dash: [0, 0],  speed: 0,         dir:  1, breathDelay: -6000,  opacity: 0.60, fill: true },
     ];
 
-    // Orbiting dots — small particles that ride along rings
     this.dots = [
       { ring: 0, angle: 0,      speed: 0.0006,  size: 2.0 },
       { ring: 0, angle: Math.PI, speed: 0.0006,  size: 1.5 },
@@ -39,21 +37,11 @@ class RingsAnimation {
 
     this.resize();
     window.addEventListener('resize', () => this.resize());
-
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting && !this.revealed) {
-          this.revealed = true;
-          this.animateDrawIn();
-        }
-      });
-    }, { threshold: 0.3 });
-    obs.observe(canvas);
   }
 
   resize() {
-    const rect = this.canvas.parentElement.getBoundingClientRect();
-    const size = Math.min(rect.width, rect.height, 280);
+    const parent = this.canvas.parentElement;
+    const size = Math.min(parent.offsetWidth, parent.offsetHeight, 280);
     this.size = size;
     this.canvas.width = size * this.dpr;
     this.canvas.height = size * this.dpr;
@@ -63,6 +51,8 @@ class RingsAnimation {
   }
 
   animateDrawIn() {
+    if (this.revealed) return;
+    this.revealed = true;
     const duration = 2200;
     const start = performance.now();
 
@@ -92,18 +82,15 @@ class RingsAnimation {
 
     const isLooping = this.revealed && this.drawProgress >= 1;
 
-    // Draw rings
     this.rings.forEach((ring, i) => {
       const ringProgress = Math.max(0, Math.min(1, (this.drawProgress * (this.rings.length + 1) - i) / 2));
       if (ringProgress <= 0) return;
 
-      // Breathing — each ring at its own phase
       const breathAmp = isLooping ? 0.025 : 0;
       const breathScale = 1 + Math.sin((t + ring.breathDelay) * 0.0006) * breathAmp;
 
       const r = ring.r * size * breathScale;
 
-      // Rotation offset
       const rotation = isLooping ? t * ring.speed * ring.dir : 0;
 
       ctx.save();
@@ -130,7 +117,6 @@ class RingsAnimation {
       ctx.restore();
     });
 
-    // Draw orbiting dots
     if (isLooping) {
       this.dots.forEach(dot => {
         const ring = this.rings[dot.ring];
@@ -138,21 +124,18 @@ class RingsAnimation {
         const breathScale = 1 + Math.sin((t + ring.breathDelay) * 0.0006) * breathAmp;
         const r = ring.r * size * breathScale;
 
-        // Dot angle includes ring rotation + its own orbit
         const ringRotation = t * ring.speed * ring.dir;
         const angle = dot.angle + t * dot.speed + ringRotation;
 
         const dx = cx + Math.cos(angle) * r;
         const dy = cy + Math.sin(angle) * r;
 
-        // Soft glow
         const grad = ctx.createRadialGradient(dx, dy, 0, dx, dy, dot.size * 3);
         grad.addColorStop(0, `rgba(0,51,70,0.3)`);
         grad.addColorStop(1, `rgba(0,51,70,0)`);
         ctx.fillStyle = grad;
         ctx.fillRect(dx - dot.size * 3, dy - dot.size * 3, dot.size * 6, dot.size * 6);
 
-        // Dot core
         ctx.beginPath();
         ctx.arc(dx, dy, dot.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(0,51,70,${0.5 + Math.sin(t * 0.002 + dot.angle) * 0.2})`;
@@ -160,7 +143,6 @@ class RingsAnimation {
       });
     }
 
-    // Center label
     if (this.drawProgress > 0.75) {
       const labelAlpha = Math.min(1, (this.drawProgress - 0.75) / 0.25) * 0.7;
       ctx.fillStyle = `rgba(0,51,70,${labelAlpha})`;
@@ -188,7 +170,7 @@ class RingsAnimation {
 }
 
 // ── Init ──
-document.addEventListener('DOMContentLoaded', () => {
+function _init_rings() {
   const canvas = document.getElementById('ringsCanvas');
   if (!canvas) return;
 
@@ -199,6 +181,22 @@ document.addEventListener('DOMContentLoaded', () => {
     rings.revealed = true;
     rings.draw(0);
   } else {
+    // Reveal on scroll
+    const revealObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting && !rings.revealed) {
+          rings.animateDrawIn();
+        }
+      });
+    }, { threshold: 0.25 });
+    revealObs.observe(canvas);
+    // Play/pause on visibility
     observeCanvas(canvas, () => { if (rings.revealed) rings.start(); }, () => rings.stop());
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _init_rings);
+} else {
+  _init_rings();
+}
