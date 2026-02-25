@@ -76,79 +76,79 @@ class GyroscopeAnimation {
     this.rings = [
       // Inner rings — tight, fast
       {
-        radius: 0.16, segments: 100, lineWidth: 1.8,
+        radius: 0.16, segments: 100, lineWidth: 2.0,
         tiltX: 0.3, tiltY: 0, tiltZ: 0,
         spinAxis: 'y', spinSpeed: 0.0005, spinAngle: 0,
-        color: W, opacity: 0.6,
+        color: W, opacity: 0.65,
         dashPattern: null, bloomDelay: 200,
       },
       {
-        radius: 0.21, segments: 100, lineWidth: 1.5,
+        radius: 0.21, segments: 100, lineWidth: 1.7,
         tiltX: PI * 0.42, tiltY: PI * 0.15, tiltZ: 0,
         spinAxis: 'x', spinSpeed: -0.00042, spinAngle: 0,
-        color: W, opacity: 0.45,
+        color: W, opacity: 0.50,
         dashPattern: null, bloomDelay: 350,
       },
       {
-        radius: 0.19, segments: 100, lineWidth: 1.0,
+        radius: 0.19, segments: 100, lineWidth: 1.2,
         tiltX: PI * 0.52, tiltY: 0, tiltZ: PI * 0.3,
         spinAxis: 'z', spinSpeed: 0.000378, spinAngle: 0,
-        color: W, opacity: 0.3,
+        color: W, opacity: 0.35,
         dashPattern: [4, 5], bloomDelay: 500,
       },
 
       // Middle rings
       {
-        radius: 0.30, segments: 140, lineWidth: 1.1,
+        radius: 0.30, segments: 140, lineWidth: 1.3,
         tiltX: 0.15, tiltY: PI * 0.25, tiltZ: 0,
         spinAxis: 'y', spinSpeed: 0.000294, spinAngle: 0,
-        color: W, opacity: 0.28,
+        color: W, opacity: 0.32,
         dashPattern: null, bloomDelay: 650,
       },
       {
-        radius: 0.34, segments: 140, lineWidth: 0.9,
+        radius: 0.34, segments: 140, lineWidth: 1.1,
         tiltX: PI * 0.35, tiltY: 0, tiltZ: PI * 0.5,
         spinAxis: 'x', spinSpeed: -0.000252, spinAngle: 0,
-        color: W, opacity: 0.22,
+        color: W, opacity: 0.26,
         dashPattern: [5, 7], bloomDelay: 800,
       },
       {
-        radius: 0.28, segments: 120, lineWidth: 0.8,
+        radius: 0.28, segments: 120, lineWidth: 1.0,
         tiltX: PI * 0.6, tiltY: PI * 0.4, tiltZ: 0,
         spinAxis: 'z', spinSpeed: 0.000336, spinAngle: 0,
-        color: W, opacity: 0.18,
+        color: W, opacity: 0.22,
         dashPattern: [3, 4], bloomDelay: 750,
       },
 
       // Outer rings — large, slower, ethereal
       {
-        radius: 0.42, segments: 180, lineWidth: 0.7,
+        radius: 0.42, segments: 180, lineWidth: 0.9,
         tiltX: 0.1, tiltY: PI * 0.1, tiltZ: PI * 0.2,
         spinAxis: 'y', spinSpeed: 0.000168, spinAngle: 0,
-        color: W, opacity: 0.14,
+        color: W, opacity: 0.18,
         dashPattern: [2, 4], bloomDelay: 1000,
       },
       {
-        radius: 0.46, segments: 180, lineWidth: 0.5,
+        radius: 0.46, segments: 180, lineWidth: 0.7,
         tiltX: PI * 0.45, tiltY: PI * 0.3, tiltZ: 0,
         spinAxis: 'x', spinSpeed: -0.000147, spinAngle: 0,
-        color: W, opacity: 0.10,
+        color: W, opacity: 0.14,
         dashPattern: [2, 3], bloomDelay: 1200,
       },
 
       // Wide outer rings — fill full page width
       {
-        radius: 0.58, segments: 220, lineWidth: 0.4,
+        radius: 0.58, segments: 220, lineWidth: 0.6,
         tiltX: PI * 0.12, tiltY: PI * 0.08, tiltZ: PI * 0.35,
         spinAxis: 'z', spinSpeed: 0.00012, spinAngle: 0,
-        color: W, opacity: 0.07,
+        color: W, opacity: 0.11,
         dashPattern: [2, 6], bloomDelay: 1400,
       },
       {
-        radius: 0.72, segments: 260, lineWidth: 0.3,
+        radius: 0.72, segments: 260, lineWidth: 0.5,
         tiltX: PI * 0.3, tiltY: PI * 0.18, tiltZ: 0,
         spinAxis: 'y', spinSpeed: -0.0001, spinAngle: 0,
-        color: W, opacity: 0.05,
+        color: W, opacity: 0.08,
         dashPattern: [1, 5], bloomDelay: 1600,
       },
     ];
@@ -259,6 +259,10 @@ class GyroscopeAnimation {
     }
     this.core.pulsePhase += 0.0008 * dt;
 
+    // Heartbeat — slow expanding light wave from core
+    if (!this.heartbeat) this.heartbeat = { phase: 0 };
+    this.heartbeat.phase += dt * 0.00018;  // ~5.8s full cycle
+
     // Core inner rings spin
     this.core.innerRings.forEach(ir => {
       ir.angle += ir.speed * dt;
@@ -351,13 +355,17 @@ class GyroscopeAnimation {
     const pulse = Math.sin(this.core.pulsePhase) * 0.06;
     const r = this.core.radius * scale * (1 + pulse) * b;
 
-    // Soft, subtle outer glow — just a gentle orange haze
+    // Soft outer glow — breathes with the heartbeat
+    const hbPhase = this.heartbeat ? this.heartbeat.phase % 1 : 0;
+    const hbPulse = Math.pow(Math.max(0, Math.sin(hbPhase * TAU)), 2);
+    const glowIntensity = 1 + hbPulse * 0.6;
+
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    const glowR = r * 3.5;
+    const glowR = r * (3.5 + hbPulse * 1.5);
     const glow = ctx.createRadialGradient(cx, cy, r * 0.8, cx, cy, glowR);
-    glow.addColorStop(0, `rgba(255,55,0,${0.08 * b})`);
-    glow.addColorStop(0.5, `rgba(255,55,0,${0.03 * b})`);
+    glow.addColorStop(0, `rgba(255,55,0,${0.08 * glowIntensity * b})`);
+    glow.addColorStop(0.5, `rgba(255,55,0,${0.03 * glowIntensity * b})`);
     glow.addColorStop(1, 'rgba(255,55,0,0)');
     ctx.fillStyle = glow;
     ctx.fillRect(cx - glowR, cy - glowR, glowR * 2, glowR * 2);
@@ -548,6 +556,47 @@ class GyroscopeAnimation {
     ctx.restore();
   }
 
+  /* ── Heartbeat: slow radial light pulse from the core ── */
+  _drawHeartbeat(ctx, cx, cy, scale) {
+    if (!this.heartbeat || this.bloom < 0.5) return;
+
+    const phase = this.heartbeat.phase % 1;
+
+    // Two overlapping waves for a double-beat rhythm
+    const waves = [
+      { p: phase, strength: 1.0 },
+      { p: (phase + 0.15) % 1, strength: 0.5 },
+    ];
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+
+    waves.forEach(wave => {
+      // Wave expands from 0 → full radius, fading as it goes
+      const radius = wave.p * scale * 0.85;
+      const fadeIn = Math.min(1, wave.p * 8);        // quick fade in
+      const fadeOut = 1 - Math.pow(wave.p, 0.6);     // slow fade out
+      const alpha = fadeIn * fadeOut * 0.04 * wave.strength * this.bloom;
+
+      if (alpha < 0.001 || radius < 1) return;
+
+      const ringWidth = scale * 0.12;
+      const innerR = Math.max(0, radius - ringWidth);
+
+      const grad = ctx.createRadialGradient(cx, cy, innerR, cx, cy, radius);
+      grad.addColorStop(0, `rgba(255,80,20,0)`);
+      grad.addColorStop(0.3, `rgba(255,70,15,${alpha * 0.5})`);
+      grad.addColorStop(0.6, `rgba(255,255,255,${alpha})`);
+      grad.addColorStop(0.85, `rgba(255,70,15,${alpha * 0.5})`);
+      grad.addColorStop(1, `rgba(255,55,0,0)`);
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
+    });
+
+    ctx.restore();
+  }
+
   /* ── Main draw ── */
   draw(t) {
     const { ctx, bCtx, w, h } = this;
@@ -580,6 +629,9 @@ class GyroscopeAnimation {
     ctx.globalAlpha = 0.45;
     ctx.drawImage(this.buffer, 0, 0, w * this.dpr, h * this.dpr, 0, 0, w, h);
     ctx.restore();
+
+    // Heartbeat pulse wave
+    this._drawHeartbeat(ctx, cx, cy, scale);
 
     // Sharp layers
     this._drawHUD(ctx, cx, cy, scale);
