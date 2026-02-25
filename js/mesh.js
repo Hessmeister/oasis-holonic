@@ -347,26 +347,36 @@ class GyroscopeAnimation {
     ctx.restore();
   }
 
-  /* ── Draw core: flat matte orange sphere ── */
+  /* ── Draw core: flat matte orange sphere with heartbeat ignition ── */
   _drawCore(ctx, t, cx, cy, scale, fov) {
     const b = this.core.bloom;
     if (b < 0.01) return;
 
-    const pulse = Math.sin(this.core.pulsePhase) * 0.06;
-    const r = this.core.radius * scale * (1 + pulse) * b;
-
-    // Soft outer glow — breathes with the heartbeat
+    // Heartbeat: core ignites brighter, then the glow expands outward
     const hbPhase = this.heartbeat ? this.heartbeat.phase % 1 : 0;
-    const hbPulse = Math.pow(Math.max(0, Math.sin(hbPhase * TAU)), 2);
-    const glowIntensity = 1 + hbPulse * 0.6;
+    // Sharp ignition peak — rises fast, decays slowly
+    const hbRaw = Math.sin(hbPhase * TAU);
+    const hbIgnite = Math.pow(Math.max(0, hbRaw), 1.5);
+    // Secondary beat
+    const hb2Raw = Math.sin(((hbPhase + 0.15) % 1) * TAU);
+    const hb2Ignite = Math.pow(Math.max(0, hb2Raw), 1.5) * 0.4;
+    const hbPulse = Math.min(1, hbIgnite + hb2Ignite);
 
+    const pulse = Math.sin(this.core.pulsePhase) * 0.06;
+    // Core swells slightly on heartbeat
+    const hbSwell = 1 + hbPulse * 0.08;
+    const r = this.core.radius * scale * (1 + pulse) * b * hbSwell;
+
+    // Outer glow — expands dramatically from the core ignition
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    const glowR = r * (3.5 + hbPulse * 1.5);
-    const glow = ctx.createRadialGradient(cx, cy, r * 0.8, cx, cy, glowR);
-    glow.addColorStop(0, `rgba(255,55,0,${0.08 * glowIntensity * b})`);
-    glow.addColorStop(0.5, `rgba(255,55,0,${0.03 * glowIntensity * b})`);
-    glow.addColorStop(1, 'rgba(255,55,0,0)');
+    const glowIntensity = 1 + hbPulse * 1.2;
+    const glowR = r * (3.5 + hbPulse * 3.0);
+    const glow = ctx.createRadialGradient(cx, cy, r * 0.5, cx, cy, glowR);
+    glow.addColorStop(0, `rgba(255,70,10,${0.12 * glowIntensity * b})`);
+    glow.addColorStop(0.3, `rgba(255,55,0,${0.06 * glowIntensity * b})`);
+    glow.addColorStop(0.7, `rgba(255,40,0,${0.02 * glowIntensity * b})`);
+    glow.addColorStop(1, 'rgba(255,30,0,0)');
     ctx.fillStyle = glow;
     ctx.fillRect(cx - glowR, cy - glowR, glowR * 2, glowR * 2);
     ctx.restore();
@@ -397,20 +407,43 @@ class GyroscopeAnimation {
       }
     });
 
-    // Flat matte orange sphere — very gentle gradient, no shiny 3D effect
-    const grad = ctx.createRadialGradient(
-      cx, cy, 0,
-      cx, cy, r
-    );
-    // Flat: nearly uniform color, very subtle edge darkening
-    grad.addColorStop(0, `rgba(255,65,15,${0.95 * b})`);
-    grad.addColorStop(0.7, `rgba(255,55,0,${0.92 * b})`);
-    grad.addColorStop(1, `rgba(230,45,0,${0.85 * b})`);
+    // Orange sphere — heartbeat ignites from within (orange → hotter orange-white)
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+    // At rest: flat matte orange. On beat: center shifts toward bright white-orange
+    const centerR = Math.round(255);
+    const centerG = Math.round(65 + hbPulse * 120);   // 65 → 185 (toward warm white)
+    const centerB = Math.round(15 + hbPulse * 80);    // 15 → 95
+    const midR = 255;
+    const midG = Math.round(55 + hbPulse * 60);       // 55 → 115
+    const midB = Math.round(0 + hbPulse * 30);        // 0 → 30
+    const edgeR = 230;
+    const edgeG = Math.round(45 + hbPulse * 30);
+    const edgeB = Math.round(0 + hbPulse * 10);
+
+    grad.addColorStop(0, `rgba(${centerR},${centerG},${centerB},${0.95 * b})`);
+    grad.addColorStop(0.7, `rgba(${midR},${midG},${midB},${0.92 * b})`);
+    grad.addColorStop(1, `rgba(${edgeR},${edgeG},${edgeB},${0.85 * b})`);
 
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, TAU);
     ctx.fillStyle = grad;
     ctx.fill();
+
+    // Hot-white bloom overlay on peak ignition
+    if (hbPulse > 0.1) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+      const hotR = r * 0.7;
+      const hotGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, hotR);
+      hotGrad.addColorStop(0, `rgba(255,220,180,${0.25 * hbPulse * b})`);
+      hotGrad.addColorStop(0.5, `rgba(255,120,50,${0.1 * hbPulse * b})`);
+      hotGrad.addColorStop(1, 'rgba(255,60,10,0)');
+      ctx.fillStyle = hotGrad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, hotR, 0, TAU);
+      ctx.fill();
+      ctx.restore();
+    }
   }
 
   /* ── Draw particles (all white, with white glow) ── */
