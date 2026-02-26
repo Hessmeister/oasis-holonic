@@ -523,36 +523,38 @@ class GyroscopeAnimation {
       }
     });
 
-    // ── Layer 4: Star surface — uniform warm orange, pulse at surface ──
-    // Like a real star: mostly uniform colour, slight limb darkening
+    // ── Layer 4: Star surface — subtle warm center, rich gradient to limb ──
     const sphereR = r * 1.35;
     const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, sphereR);
     const h = hbPulse;
-    // Uniform warm orange — heartbeat brightens the entire surface equally
-    const sR = 255;
-    const sG = Math.round(140 + h * 20);  // green: 140-160 (orange, not yellow)
-    const sB = Math.round(20 + h * 10);   // blue:  20-30
-    grad.addColorStop(0,    `rgba(${sR},${sG},${sB},${b})`);              // same as surface
-    grad.addColorStop(0.3,  `rgba(${sR},${sG},${sB},${b})`);             // main surface color
-    grad.addColorStop(0.55, `rgba(${sR},${sG - 3},${sB - 2},${b})`);     // uniform
-    grad.addColorStop(0.72, `rgba(${sR},${sG - 10},${sB - 5},${0.92 * b})`); // slight limb darkening
-    // Soft fade into corona — no hard edge
-    grad.addColorStop(0.85, `rgba(255,${Math.round(110 + h * 10)},${Math.round(15 + h * 5)},${0.4 * b})`);
-    grad.addColorStop(1,    `rgba(255,60,0,0)`);
+    // Center: warm orange-yellow (subtle, not blazing white)
+    grad.addColorStop(0,    `rgba(255,${Math.round(185 + h * 15)},${Math.round(65 + h * 25)},${b})`);
+    // Inner surface: golden orange
+    grad.addColorStop(0.2,  `rgba(255,${Math.round(165 + h * 12)},${Math.round(40 + h * 15)},${b})`);
+    // Main surface: rich vivid orange
+    grad.addColorStop(0.45, `rgba(255,${Math.round(145 + h * 10)},${Math.round(22 + h * 8)},${b})`);
+    // Outer surface: deeper orange with limb darkening
+    grad.addColorStop(0.65, `rgba(255,${Math.round(125 + h * 8)},${Math.round(12 + h * 5)},${0.95 * b})`);
+    // Limb: deep orange-red
+    grad.addColorStop(0.78, `rgba(245,${Math.round(90 + h * 8)},${Math.round(5 + h * 3)},${0.85 * b})`);
+    // Soft fade into corona
+    grad.addColorStop(0.9,  `rgba(230,${Math.round(65 + h * 5)},0,${0.35 * b})`);
+    grad.addColorStop(1,    'rgba(200,40,0,0)');
 
     ctx.fillStyle = grad;
     ctx.fillRect(cx - sphereR, cy - sphereR, sphereR * 2, sphereR * 2);
 
-    // ── Layer 5: Limb glow — bridges surface into corona ──
+    // ── Layer 5: Limb glow — warm ring at the surface edge ──
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    const limbR = r * 1.6;
-    const limbGrad = ctx.createRadialGradient(cx, cy, r * 0.5, cx, cy, limbR);
-    const lIntensity = 0.2 + h * 0.15;
-    limbGrad.addColorStop(0, 'rgba(255,140,30,0)');
-    limbGrad.addColorStop(0.55, `rgba(255,120,15,${lIntensity * 0.12 * b})`);
-    limbGrad.addColorStop(0.75, `rgba(255,80,0,${lIntensity * 0.2 * b})`);
-    limbGrad.addColorStop(1, 'rgba(200,30,0,0)');
+    const limbR = r * 1.7;
+    const limbGrad = ctx.createRadialGradient(cx, cy, r * 0.6, cx, cy, limbR);
+    const lI = 0.22 + h * 0.18;
+    limbGrad.addColorStop(0, 'rgba(255,120,20,0)');
+    limbGrad.addColorStop(0.45, `rgba(255,110,10,${lI * 0.08 * b})`);
+    limbGrad.addColorStop(0.65, `rgba(255,80,0,${lI * 0.18 * b})`);
+    limbGrad.addColorStop(0.82, `rgba(240,50,0,${lI * 0.10 * b})`);
+    limbGrad.addColorStop(1, 'rgba(180,20,0,0)');
     ctx.fillStyle = limbGrad;
     ctx.fillRect(cx - limbR, cy - limbR, limbR * 2, limbR * 2);
     ctx.restore();
