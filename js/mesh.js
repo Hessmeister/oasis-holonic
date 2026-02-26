@@ -388,42 +388,46 @@ class GyroscopeAnimation {
     const hbSwell = 1 + hbPulse * 0.1;
     const r = this.core.radius * scale * (1 + pulse) * b * hbSwell;
 
-    // ── Layer 1: Deep red corona (outermost glow) — starts at surface ──
+    // ── Layer 1: Wide corona — warm red-brown atmosphere ──
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    const coronaR = r * (5 + hbPulse * 4);
-    const corona = ctx.createRadialGradient(cx, cy, r, cx, cy, coronaR);
+    const coronaR = r * (5.5 + hbPulse * 3.5);
+    const corona = ctx.createRadialGradient(cx, cy, r * 0.95, cx, cy, coronaR);
     const cBoost = 1 + hbPulse * 1.2;
     const ci = cBoost;
-    corona.addColorStop(0, `rgba(200,40,0,${0.28 * ci * b})`);
-    corona.addColorStop(0.2, `rgba(180,20,0,${0.16 * ci * b})`);
-    corona.addColorStop(0.5, `rgba(140,10,0,${0.08 * ci * b})`);
-    corona.addColorStop(0.8, `rgba(100,5,0,${0.03 * ci * b})`);
-    corona.addColorStop(1, 'rgba(60,0,0,0)');
+    corona.addColorStop(0,    `rgba(220,60,5,${0.22 * ci * b})`);
+    corona.addColorStop(0.08, `rgba(200,45,0,${0.18 * ci * b})`);
+    corona.addColorStop(0.22, `rgba(170,25,0,${0.12 * ci * b})`);
+    corona.addColorStop(0.45, `rgba(130,12,0,${0.06 * ci * b})`);
+    corona.addColorStop(0.7,  `rgba(90,5,0,${0.025 * ci * b})`);
+    corona.addColorStop(1,    'rgba(50,0,0,0)');
     ctx.fillStyle = corona;
     ctx.fillRect(cx - coronaR, cy - coronaR, coronaR * 2, coronaR * 2);
     ctx.restore();
 
-    // ── Layer 2: Orange-red mid glow — starts at surface ──
+    // ── Layer 2: Mid corona — warm orange haze ──
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    const midGlowR = r * (2.8 + hbPulse * 2);
-    const midGlow = ctx.createRadialGradient(cx, cy, r, cx, cy, midGlowR);
-    midGlow.addColorStop(0, `rgba(255,80,0,${0.30 * ci * b})`);
-    midGlow.addColorStop(0.3, `rgba(255,50,0,${0.14 * ci * b})`);
-    midGlow.addColorStop(1, 'rgba(200,20,0,0)');
+    const midGlowR = r * (3.0 + hbPulse * 1.8);
+    const midGlow = ctx.createRadialGradient(cx, cy, r * 0.85, cx, cy, midGlowR);
+    midGlow.addColorStop(0,    `rgba(255,100,15,${0.24 * ci * b})`);
+    midGlow.addColorStop(0.15, `rgba(255,75,5,${0.16 * ci * b})`);
+    midGlow.addColorStop(0.4,  `rgba(240,45,0,${0.08 * ci * b})`);
+    midGlow.addColorStop(0.7,  `rgba(200,20,0,${0.03 * ci * b})`);
+    midGlow.addColorStop(1,    'rgba(150,10,0,0)');
     ctx.fillStyle = midGlow;
     ctx.fillRect(cx - midGlowR, cy - midGlowR, midGlowR * 2, midGlowR * 2);
     ctx.restore();
 
-    // ── Layer 3: Bright orange inner glow — starts at surface ──
+    // ── Layer 3: Inner corona — bright orange rim light ──
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    const innerGlowR = r * (1.8 + hbPulse * 0.8);
-    const innerGlow = ctx.createRadialGradient(cx, cy, r * 0.9, cx, cy, innerGlowR);
-    innerGlow.addColorStop(0, `rgba(255,140,30,${0.25 * ci * b})`);
-    innerGlow.addColorStop(0.4, `rgba(255,80,5,${0.12 * ci * b})`);
-    innerGlow.addColorStop(1, 'rgba(255,40,0,0)');
+    const innerGlowR = r * (1.9 + hbPulse * 0.7);
+    const innerGlow = ctx.createRadialGradient(cx, cy, r * 0.8, cx, cy, innerGlowR);
+    innerGlow.addColorStop(0,    `rgba(255,150,40,${0.20 * ci * b})`);
+    innerGlow.addColorStop(0.25, `rgba(255,110,15,${0.14 * ci * b})`);
+    innerGlow.addColorStop(0.55, `rgba(255,65,0,${0.06 * ci * b})`);
+    innerGlow.addColorStop(1,    'rgba(230,30,0,0)');
     ctx.fillStyle = innerGlow;
     ctx.fillRect(cx - innerGlowR, cy - innerGlowR, innerGlowR * 2, innerGlowR * 2);
     ctx.restore();
@@ -523,38 +527,43 @@ class GyroscopeAnimation {
       }
     });
 
-    // ── Layer 4: Star surface — subtle warm center, rich gradient to limb ──
-    const sphereR = r * 1.35;
+    // ── Layer 4: Star surface — photographic sun gradient ──
+    const sphereR = r * 1.4;
     const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, sphereR);
     const h = hbPulse;
-    // Center: warm orange-yellow (subtle, not blazing white)
-    grad.addColorStop(0,    `rgba(255,${Math.round(185 + h * 15)},${Math.round(65 + h * 25)},${b})`);
-    // Inner surface: golden orange
-    grad.addColorStop(0.2,  `rgba(255,${Math.round(165 + h * 12)},${Math.round(40 + h * 15)},${b})`);
-    // Main surface: rich vivid orange
-    grad.addColorStop(0.45, `rgba(255,${Math.round(145 + h * 10)},${Math.round(22 + h * 8)},${b})`);
-    // Outer surface: deeper orange with limb darkening
-    grad.addColorStop(0.65, `rgba(255,${Math.round(125 + h * 8)},${Math.round(12 + h * 5)},${0.95 * b})`);
-    // Limb: deep orange-red
-    grad.addColorStop(0.78, `rgba(245,${Math.round(90 + h * 8)},${Math.round(5 + h * 3)},${0.85 * b})`);
-    // Soft fade into corona
-    grad.addColorStop(0.9,  `rgba(230,${Math.round(65 + h * 5)},0,${0.35 * b})`);
-    grad.addColorStop(1,    'rgba(200,40,0,0)');
+    // Subtle warm center — golden amber, not white
+    grad.addColorStop(0,    `rgba(255,${Math.round(180 + h * 15)},${Math.round(55 + h * 20)},${b})`);
+    // Warm inner — rich golden orange
+    grad.addColorStop(0.15, `rgba(255,${Math.round(168 + h * 12)},${Math.round(38 + h * 14)},${b})`);
+    // Mid surface — the dominant vivid orange tone
+    grad.addColorStop(0.35, `rgba(255,${Math.round(148 + h * 10)},${Math.round(20 + h * 8)},${b})`);
+    // Photosphere — starts to deepen
+    grad.addColorStop(0.52, `rgba(255,${Math.round(130 + h * 8)},${Math.round(12 + h * 5)},${0.98 * b})`);
+    // Limb darkening zone — rich burnt orange
+    grad.addColorStop(0.66, `rgba(250,${Math.round(105 + h * 6)},${Math.round(5 + h * 3)},${0.92 * b})`);
+    // Deep limb — approaching red
+    grad.addColorStop(0.76, `rgba(240,${Math.round(78 + h * 5)},${Math.round(0 + h * 2)},${0.82 * b})`);
+    // Corona transition — fading
+    grad.addColorStop(0.86, `rgba(225,${Math.round(55 + h * 4)},0,${0.45 * b})`);
+    // Feathered edge
+    grad.addColorStop(0.94, `rgba(210,35,0,${0.15 * b})`);
+    grad.addColorStop(1,    'rgba(180,20,0,0)');
 
     ctx.fillStyle = grad;
     ctx.fillRect(cx - sphereR, cy - sphereR, sphereR * 2, sphereR * 2);
 
-    // ── Layer 5: Limb glow — warm ring at the surface edge ──
+    // ── Layer 5: Limb brightening — subtle bright ring at surface edge ──
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
-    const limbR = r * 1.7;
-    const limbGrad = ctx.createRadialGradient(cx, cy, r * 0.6, cx, cy, limbR);
-    const lI = 0.22 + h * 0.18;
-    limbGrad.addColorStop(0, 'rgba(255,120,20,0)');
-    limbGrad.addColorStop(0.45, `rgba(255,110,10,${lI * 0.08 * b})`);
-    limbGrad.addColorStop(0.65, `rgba(255,80,0,${lI * 0.18 * b})`);
-    limbGrad.addColorStop(0.82, `rgba(240,50,0,${lI * 0.10 * b})`);
-    limbGrad.addColorStop(1, 'rgba(180,20,0,0)');
+    const limbR = r * 1.8;
+    const limbGrad = ctx.createRadialGradient(cx, cy, r * 0.55, cx, cy, limbR);
+    const lI = 0.20 + h * 0.16;
+    limbGrad.addColorStop(0,    'rgba(255,130,25,0)');
+    limbGrad.addColorStop(0.40, `rgba(255,115,12,${lI * 0.06 * b})`);
+    limbGrad.addColorStop(0.58, `rgba(255,90,5,${lI * 0.14 * b})`);
+    limbGrad.addColorStop(0.72, `rgba(250,65,0,${lI * 0.12 * b})`);
+    limbGrad.addColorStop(0.85, `rgba(230,40,0,${lI * 0.05 * b})`);
+    limbGrad.addColorStop(1,    'rgba(180,15,0,0)');
     ctx.fillStyle = limbGrad;
     ctx.fillRect(cx - limbR, cy - limbR, limbR * 2, limbR * 2);
     ctx.restore();
