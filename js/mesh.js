@@ -9,6 +9,30 @@ import { observeCanvas, prefersReducedMotion } from './main.js';
 const TAU = Math.PI * 2;
 const PI  = Math.PI;
 
+/* ── Simple smooth noise (value noise with cosine interpolation) ── */
+function _hashAngle(i, seed) {
+  // Quick deterministic hash → [0,1]
+  let n = (i + seed * 137) * 43758.5453;
+  return (n - Math.floor(n));
+}
+
+function smoothNoise(angle, octaves, seed, time) {
+  let val = 0, amp = 1, freq = 1, maxAmp = 0;
+  for (let o = 0; o < octaves; o++) {
+    const a = angle * freq + time * (0.3 + o * 0.15);
+    const i = Math.floor(a);
+    const f = a - i;
+    const smooth = 0.5 - 0.5 * Math.cos(f * PI);  // cosine interp
+    const v0 = _hashAngle(i, seed + o * 31);
+    const v1 = _hashAngle(i + 1, seed + o * 31);
+    val += (v0 + (v1 - v0) * smooth) * amp;
+    maxAmp += amp;
+    amp *= 0.5;
+    freq *= 2.1;
+  }
+  return val / maxAmp;   // [0, 1]
+}
+
 /* ── 3D Math helpers ── */
 
 function rotateX(p, a) {
@@ -405,6 +429,77 @@ class GyroscopeAnimation {
     ctx.fillStyle = innerGlow;
     ctx.fillRect(cx - innerGlowR, cy - innerGlowR, innerGlowR * 2, innerGlowR * 2);
     ctx.restore();
+
+    // ── Layer 3b: Solar flares / aurora tendrils ──
+    // Organic, irregular radiation — like orange northern lights
+    {
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
+
+      const flareTime = t * 0.00006;  // very slow drift
+      const flareRes = 128;            // smooth curves
+      const flareSeeds = [7, 23, 41, 59]; // 4 overlapping layers
+
+      for (let layer = 0; layer < 4; layer++) {
+        const seed = flareSeeds[layer];
+        // Each layer: different reach, speed, color temperature
+        const baseReach = r * (1.4 + layer * 0.8);
+        const flareExtra = r * (2.0 + layer * 1.4 + hbPulse * (1.5 + layer * 0.8));
+        const layerAlpha = (0.09 - layer * 0.015) * ci * b;
+        const timeOffset = layer * 3.7;  // desync layers
+
+        // Build smooth closed flare path
+        ctx.beginPath();
+        for (let i = 0; i <= flareRes; i++) {
+          const angle = (i / flareRes) * TAU;
+          // Fewer angular cycles → broader, sweeping tendrils
+          const nFreq = 3 + layer;  // 3-6 lobes around the circle
+          const n = smoothNoise(angle / TAU * nFreq, 3, seed, flareTime + timeOffset);
+          // Softer peaks for aurora-like wisps
+          const tendril = Math.pow(n, 1.3);
+          const dist = baseReach + tendril * flareExtra;
+
+          const fx = cx + Math.cos(angle) * dist;
+          const fy = cy + Math.sin(angle) * dist;
+          if (i === 0) ctx.moveTo(fx, fy);
+          else ctx.lineTo(fx, fy);
+        }
+        ctx.closePath();
+
+        // Radial gradient fill
+        const maxFlareR = baseReach + flareExtra;
+        const flareGrad = ctx.createRadialGradient(cx, cy, r * 0.6, cx, cy, maxFlareR);
+
+        if (layer === 0) {
+          // Bright warm orange — closest to core
+          flareGrad.addColorStop(0, `rgba(255,150,40,${layerAlpha * 1.8})`);
+          flareGrad.addColorStop(0.3, `rgba(255,110,15,${layerAlpha * 1.2})`);
+          flareGrad.addColorStop(0.6, `rgba(255,70,0,${layerAlpha * 0.5})`);
+          flareGrad.addColorStop(1, 'rgba(200,30,0,0)');
+        } else if (layer === 1) {
+          // Orange aurora wisps
+          flareGrad.addColorStop(0, `rgba(255,100,15,${layerAlpha * 1.5})`);
+          flareGrad.addColorStop(0.35, `rgba(255,70,0,${layerAlpha})`);
+          flareGrad.addColorStop(0.65, `rgba(220,40,0,${layerAlpha * 0.4})`);
+          flareGrad.addColorStop(1, 'rgba(160,15,0,0)');
+        } else if (layer === 2) {
+          // Deep red-orange tendrils
+          flareGrad.addColorStop(0, `rgba(230,60,5,${layerAlpha * 1.2})`);
+          flareGrad.addColorStop(0.4, `rgba(200,35,0,${layerAlpha * 0.7})`);
+          flareGrad.addColorStop(1, 'rgba(120,8,0,0)');
+        } else {
+          // Outermost: faint deep red wisps reaching far
+          flareGrad.addColorStop(0, `rgba(200,40,0,${layerAlpha})`);
+          flareGrad.addColorStop(0.5, `rgba(150,15,0,${layerAlpha * 0.4})`);
+          flareGrad.addColorStop(1, 'rgba(80,5,0,0)');
+        }
+
+        ctx.fillStyle = flareGrad;
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
 
     // ── White inner mini-rings orbiting the core ──
     this.core.innerRings.forEach(ir => {
