@@ -21,6 +21,7 @@
     <a href="#holarchy">Holarchy</a>
     <a href="#providers">Providers</a>
     <a href="#star">STAR ODK</a>
+    <a href="#commons">Commons</a>
     <a href="#build">Build</a>
     <a href="https://github.com/NextGenSoftwareUK/OASIS" target="_blank" class="nav-btn">Source</a>
   </div>
@@ -103,19 +104,16 @@
 
     <div class="col3 stagger">
       <div class="col3-item">
-        <div class="col3-num">01</div>
         <h3 class="col3-title">Identity</h3>
         <p class="col3-desc">Every holon has a GUID, version history, audit trail, and change detection. It knows who created it, who modified it, and when.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col3-item">
-        <div class="col3-num">02</div>
         <h3 class="col3-title">Hierarchy</h3>
         <p class="col3-desc">Holons nest inside holons. A parent references children; children reference their parent. Infinite depth. One tree.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col3-item">
-        <div class="col3-num">03</div>
         <h3 class="col3-title">Portability</h3>
         <p class="col3-desc">Each holon maps its ID to every provider it touches via <code>ProviderUniqueStorageKey</code>. Move between Ethereum, MongoDB, Holochain &mdash; zero data loss.</p>
       </div>
@@ -168,25 +166,21 @@
     <!-- Tiers grid below -->
     <div class="col4 stagger" style="margin-top:3rem;">
       <div class="col4-item">
-        <div class="col4-num">I</div>
         <h3 class="col4-title">Stars</h3>
         <p class="col4-desc">Top-level platforms &mdash; full OAPPs with their own ecosystems. A Star is an application that contains Planets and Moons as sub-modules. Think of it as the root of an entire product.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col4-item">
-        <div class="col4-num">II</div>
         <h3 class="col4-title">Planets</h3>
         <p class="col4-desc">Major modules or feature domains within a Star. Each Planet is a holon &mdash; independently deployable, with its own children &mdash; but bound to its parent Star&rsquo;s identity.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col4-item">
-        <div class="col4-num">III</div>
         <h3 class="col4-title">Moons</h3>
         <p class="col4-desc">Small, self-contained apps or micro-services. Every OAPP starts life as a Moon. Moons orbit their Planet parent and carry their own Zomes inside.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col4-item">
-        <div class="col4-num">IV</div>
         <h3 class="col4-title">Zomes &amp; Holons</h3>
         <p class="col4-desc">The atomic layer. Zomes group related holons &mdash; profiles, quests, NFTs, game items &mdash; into logical bundles. Each holon is the leaf node: one piece of data, stored on any provider.</p>
       </div>
@@ -210,19 +204,16 @@
 
     <div class="col3 stagger">
       <div class="col3-item">
-        <div class="col3-num">04</div>
         <h3 class="col3-title">One Interface</h3>
         <p class="col3-desc"><code>IOASISStorageProvider</code> defines CRUD for holons and avatars. Every provider implements it. Your app calls one API regardless of backend.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col3-item">
-        <div class="col3-num">05</div>
         <h3 class="col3-title">Auto-Failover</h3>
         <p class="col3-desc">If the active provider goes down, OASIS switches to the next in the failover list. No downtime. No code changes.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col3-item">
-        <div class="col3-num">06</div>
         <h3 class="col3-title">Auto-Replication</h3>
         <p class="col3-desc">Write to multiple providers simultaneously. Data lives on Ethereum and MongoDB at the same time. Redundancy by default.</p>
       </div>
@@ -253,19 +244,16 @@
 
     <div class="col3 stagger" style="margin-top:2rem;">
       <div class="col3-item">
-        <div class="col3-num">STAR</div>
         <h3 class="col3-title">STAR CLI</h3>
         <p class="col3-desc">Generate, publish, install, and launch holonic OAPPs from the command line. Scaffolds the full OASIS stack.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col3-item">
-        <div class="col3-num">COSMIC</div>
         <h3 class="col3-title">COSMIC ORM</h3>
         <p class="col3-desc">Maps your data models to holons automatically. Your classes inherit holon properties &mdash; GUID, versioning, provider keys &mdash; without manual wiring.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col3-item">
-        <div class="col3-num">OAPP</div>
         <h3 class="col3-title">OAPPs</h3>
         <p class="col3-desc">OASIS Applications. Holonic apps that run on any provider. Build once, deploy to any blockchain or database the OASIS API supports.</p>
       </div>
@@ -284,25 +272,21 @@
 
     <div class="col4 stagger">
       <div class="col4-item">
-        <div class="col4-num">07</div>
         <h3 class="col4-title">No Lock-In</h3>
         <p class="col4-desc">Store holons on Ethereum today, migrate to Solana tomorrow. Zero code changes.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col4-item">
-        <div class="col4-num">08</div>
         <h3 class="col4-title">Auto-Failover</h3>
         <p class="col4-desc">Primary provider down? The next one activates automatically from the configured failover list.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col4-item">
-        <div class="col4-num">09</div>
         <h3 class="col4-title">Replication</h3>
         <p class="col4-desc">Holons replicate across multiple providers simultaneously. Data is never trapped in one place.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col4-item">
-        <div class="col4-num">10</div>
         <h3 class="col4-title">Load Balanced</h3>
         <p class="col4-desc">Requests distribute across active providers based on performance metrics.</p>
       </div>
@@ -356,25 +340,21 @@
 
     <div class="col4 stagger">
       <div class="col4-item">
-        <div class="col4-num">11</div>
         <h3 class="col4-title">One Identity</h3>
         <p class="col4-desc">Your Avatar is a holon. It carries credentials, provider wallets, and JWT tokens across every OAPP.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col4-item">
-        <div class="col4-num">12</div>
         <h3 class="col4-title">Karma</h3>
         <p class="col4-desc">Numerical reputation tracked via akashic records. Earned in one app, visible in every other.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col4-item">
-        <div class="col4-num">13</div>
         <h3 class="col4-title">Inventory</h3>
         <p class="col4-desc">NFTs, tokens, and items stored in your Avatar holon. Accessible from any provider.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col4-item">
-        <div class="col4-num">14</div>
         <h3 class="col4-title">Cross-App</h3>
         <p class="col4-desc">Log in once. Your profile, reputation, and assets follow you across the entire OASIS ecosystem.</p>
       </div>
@@ -383,7 +363,37 @@
   </section>
 
 
-  <!-- 08 — START BUILDING -->
+  <!-- 08 — COMMONS -->
+  <section id="commons" class="section section--commons reveal">
+
+    <div class="commons-tags stagger">
+      <span class="commons-tag">standard terms</span>
+      <span class="commons-tag">cap-aware payouts</span>
+      <span class="commons-tag">governed commons</span>
+    </div>
+
+    <div class="commons-keywords stagger">
+      <span class="commons-kw">license IP</span>
+      <span class="commons-kw">ship companies</span>
+      <span class="commons-kw">route revenue</span>
+    </div>
+
+    <p class="commons-desc">A governed IP Pool with clear valuation and licensing terms. A Builders Fund that helps teams form real companies on top&mdash;routing revenue back to creators until a fair cap is reached.</p>
+
+    <div class="commons-ctas">
+      <a href="#build" class="commons-btn commons-btn--primary">Start building &rarr;</a>
+      <a href="#holon" class="commons-btn commons-btn--secondary">View architecture &rarr;</a>
+    </div>
+
+    <div class="commons-label">
+      <span class="commons-label-dot"></span>
+      <span>commons</span>
+    </div>
+
+  </section>
+
+
+  <!-- 09 — START BUILDING -->
   <section id="build" class="section section--orange reveal">
 
     <div class="section-head">
@@ -422,21 +432,18 @@
     <!-- Quick start paths -->
     <div class="col3 stagger" style="margin-top:3.5rem;">
       <div class="col3-item build-card">
-        <div class="col3-num">01</div>
         <h3 class="col3-title">Clone &amp; Explore</h3>
         <p class="col3-desc">Fork the repo, spin up the REST API, and explore the holon CRUD endpoints.</p>
         <a href="https://github.com/NextGenSoftwareUK/OASIS" target="_blank" class="build-link">GitHub &rarr;</a>
       </div>
       <div class="vdiv"></div>
       <div class="col3-item build-card">
-        <div class="col3-num">02</div>
         <h3 class="col3-title">Build a Moon</h3>
         <p class="col3-desc">Use the STAR CLI to scaffold the smallest holonic app. Best first project.</p>
         <a href="https://github.com/NextGenSoftwareUK/OASIS/wiki" target="_blank" class="build-link">Guide &rarr;</a>
       </div>
       <div class="vdiv"></div>
       <div class="col3-item build-card">
-        <div class="col3-num">03</div>
         <h3 class="col3-title">Write a Provider</h3>
         <p class="col3-desc">Implement <code>IOASISStorageProvider</code> for a new backend. High-impact.</p>
         <a href="https://github.com/NextGenSoftwareUK/OASIS/wiki" target="_blank" class="build-link">Docs &rarr;</a>
