@@ -1410,7 +1410,9 @@ nav.nav-collapsed.nav-open .nav-links {
 
 .footer {
   border-top: none;
-  padding: 2.5rem 0 3rem;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 2.5rem var(--page-pad) 3rem;
   display: grid;
   grid-template-columns: 1fr 1px 1fr 1px 1fr;
   gap: 0 2rem;
