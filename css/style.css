@@ -380,10 +380,10 @@ nav.nav-collapsed.nav-open .nav-links {
 }
 
 .mesh-overlay .mo-headline {
-  font-size: clamp(2.4rem, 4.8vw, 4.2rem);
+  font-size: clamp(3.2rem, 6.5vw, 6rem);
   font-weight: 700;
-  line-height: 1.06;
-  letter-spacing: -0.04em;
+  line-height: 1.02;
+  letter-spacing: -0.05em;
   color: rgba(239, 236, 232, 0.97);
 }
 
