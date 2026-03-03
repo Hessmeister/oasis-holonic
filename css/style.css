@@ -185,6 +185,7 @@ nav {
   display: flex;
   gap: 2rem;
   align-items: center;
+  transition: opacity 0.25s ease;
 }
 
 .nav-links a {
@@ -212,9 +213,9 @@ nav {
   border-color: var(--navy);
 }
 
-/* ── Hamburger button (hidden by default, shown on scroll) ── */
+/* ── Hamburger button (always in DOM, opacity-controlled) ── */
 .nav-hamburger {
-  display: none;
+  display: flex;
   background: none;
   border: none;
   cursor: pointer;
@@ -225,6 +226,9 @@ nav {
   z-index: 110;
   flex-direction: column;
   justify-content: space-between;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
 }
 
 .nav-hamburger span {
@@ -248,7 +252,20 @@ nav.nav-open .nav-hamburger span:nth-child(3) {
 }
 
 /* ── Collapsed nav state (scrolled) ── */
+/* Links fade out in-place (no position jump) */
 nav.nav-collapsed .nav-links {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Hamburger fades in */
+nav.nav-collapsed .nav-hamburger {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Collapsed + menu open: full-screen dropdown slides in */
+nav.nav-collapsed.nav-open .nav-links {
   position: fixed;
   top: 0;
   left: 0;
@@ -260,31 +277,24 @@ nav.nav-collapsed .nav-links {
   -webkit-backdrop-filter: blur(20px);
   padding: 5rem var(--page-pad) 2rem;
   gap: 1.2rem;
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
-              opacity 0.35s ease;
+  opacity: 1;
+  pointer-events: auto;
   z-index: 99;
   border-bottom: 1px solid var(--border);
+  animation: navMenuIn 0.35s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-nav.nav-collapsed .nav-links a {
+nav.nav-collapsed.nav-open .nav-links a {
   font-size: 1rem;
 }
 
-nav.nav-collapsed .nav-links .nav-btn {
+nav.nav-collapsed.nav-open .nav-links .nav-btn {
   margin-top: 0.5rem;
 }
 
-nav.nav-collapsed .nav-hamburger {
-  display: flex;
-}
-
-nav.nav-collapsed.nav-open .nav-links {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
+@keyframes navMenuIn {
+  from { transform: translateY(-12px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
 }
 
 /* ═══════════════════════════════════════
