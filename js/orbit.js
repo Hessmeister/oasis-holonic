@@ -216,14 +216,6 @@ class OrbitAnimation {
         ctx.fillText(body.label, pos.x, pos.y + s + 10);
       }
 
-      if (bodyP > 0.7) {
-        const tierA = Math.min(1, (bodyP - 0.7) * 3.3);
-        const tierSize = Math.max(8, size * 0.017);
-        ctx.fillStyle = `rgba(255,55,0,${0.7 * tierA})`;
-        ctx.font = `600 ${tierSize}px Inter, sans-serif`;
-        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
-        ctx.fillText(body.tier, pos.x + s + 8, pos.y - s + 2);
-      }
     });
   }
 

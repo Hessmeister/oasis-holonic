@@ -929,7 +929,7 @@ nav.nav-collapsed.nav-open .nav-links {
 
 .holarchy-body {
   display: grid;
-  grid-template-columns: 1fr 380px;
+  grid-template-columns: 1fr 440px;
   gap: 0 3.5rem;
   align-items: start;
   margin-bottom: 2.5rem;
