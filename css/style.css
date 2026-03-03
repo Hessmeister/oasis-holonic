@@ -181,6 +181,16 @@ nav {
   color: var(--black);
 }
 
+/* Custom A — two diagonal strokes + orange node dot */
+.nl-a {
+  display: inline-block;
+  height: 0.73em;
+  width: 0.73em;
+  vertical-align: baseline;
+  margin-bottom: -0.04em; /* sit on baseline */
+  overflow: visible;
+}
+
 .nav-links {
   display: flex;
   gap: 2rem;
