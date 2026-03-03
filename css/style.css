@@ -537,7 +537,7 @@ nav.nav-collapsed.nav-open .nav-links .nav-btn {
    Prominent, high-impact — white text
    ═══════════════════════════════════════ */
 .section--orange::before {
-  background: #3A3530;
+  background: #17120F;
 }
 
 .section--orange::after {
@@ -661,7 +661,7 @@ nav.nav-collapsed.nav-open .nav-links .nav-btn {
    Avatar, secondary dark
    ═══════════════════════════════════════ */
 .section--charcoal::before {
-  background: #38342F;
+  background: #6B5E52;
 }
 
 .section--charcoal {
@@ -686,13 +686,13 @@ nav.nav-collapsed.nav-open .nav-links .nav-btn {
 }
 
 .section--charcoal .col4-desc {
-  color: rgba(255,255,255,0.92);
+  color: rgba(255,255,255,0.88);
   font-size: 0.85rem;
   line-height: 1.7;
 }
 
 .section--charcoal .vdiv {
-  background: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.22);
 }
 
 .reveal.is-visible.section--charcoal .section-head h2 em .ink-smoke-text {
