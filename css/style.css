@@ -375,13 +375,36 @@ nav.nav-collapsed.nav-open .nav-links {
   z-index: 2;
   color: rgba(239, 236, 232, 0.85);
   pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  max-width: 700px;
 }
 
-.mesh-overlay .mo-tagline {
-  font-size: 1.05rem;
+.mesh-overlay .mo-headline {
+  font-size: clamp(2.4rem, 4.8vw, 4.2rem);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  color: rgba(239, 236, 232, 0.97);
+}
+
+.mesh-overlay .mo-body {
+  font-size: clamp(0.88rem, 1.3vw, 1.02rem);
   font-weight: 400;
-  line-height: 1.6;
-  max-width: 440px;
+  line-height: 1.68;
+  letter-spacing: -0.01em;
+  color: rgba(239, 236, 232, 0.65);
+  max-width: 480px;
+}
+
+.mesh-overlay .mo-closer {
+  font-family: 'Newsreader', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--orange);
   letter-spacing: -0.01em;
 }
 
