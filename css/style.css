@@ -929,7 +929,7 @@ nav.nav-collapsed.nav-open .nav-links {
 
 .holarchy-body {
   display: grid;
-  grid-template-columns: 1fr 440px;
+  grid-template-columns: 1fr 480px;
   gap: 0 3.5rem;
   align-items: start;
   margin-bottom: 2.5rem;
@@ -977,8 +977,6 @@ nav.nav-collapsed.nav-open .nav-links {
   width: 100%;
   aspect-ratio: 1;
   margin: 0;
-  position: sticky;
-  top: 5rem;
 }
 
 
