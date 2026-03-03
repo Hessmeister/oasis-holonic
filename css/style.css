@@ -184,10 +184,12 @@ nav {
 /* Custom A — two diagonal strokes + orange node dot */
 .nl-a {
   display: inline-block;
-  height: 0.73em;
-  width: 0.73em;
+  height: 0.76em;           /* cap height of Inter 600 */
+  width: 0.80em;            /* A is wider than average cap */
   vertical-align: baseline;
-  margin-bottom: -0.04em; /* sit on baseline */
+  margin-bottom: -0.06em;   /* sit on baseline */
+  margin-left:  -0.015em;   /* close letter-spacing gap on left */
+  margin-right: -0.015em;   /* close letter-spacing gap on right */
   overflow: visible;
 }
 
