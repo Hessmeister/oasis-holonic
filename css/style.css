@@ -179,19 +179,48 @@ nav {
   font-weight: 600;
   letter-spacing: -0.03em;
   color: var(--black);
+  position: relative; /* anchor the dot ping */
+}
+
+/* Dot ping — orange ring expands from dot position and fades */
+.nav-logo::after {
+  content: '';
+  position: absolute;
+  left: 23px;
+  top: 18px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--orange);
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0;
+  pointer-events: none;
+  animation: dotPing 0.8s ease-out 0.6s both;
+}
+
+@keyframes dotPing {
+  0%   { transform: translate(-50%, -50%) scale(0.8); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(4);   opacity: 0;   }
 }
 
 .nav-logo-img {
-  height: 1.4rem;
+  height: 2rem;
   width: auto;
   display: block;
-  mix-blend-mode: multiply; /* white bg becomes transparent on cream nav */
+  mix-blend-mode: multiply;
+  animation: logoReveal 0.55s cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+@keyframes logoReveal {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
 .nav-links {
   display: flex;
   gap: 2rem;
   align-items: center;
+  margin-left: auto; /* pin nav links to the right */
   transition: opacity 0.25s ease;
 }
 
