@@ -927,11 +927,19 @@ nav.nav-collapsed.nav-open .nav-links {
    HOLARCHY (Section 03)
    ═══════════════════════════════════════ */
 
+.holarchy-body {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 0 3rem;
+  align-items: start;
+  margin-bottom: 2.5rem;
+}
+
 .holarchy-intro {
   display: grid;
   grid-template-columns: 1.6fr 1px 1fr;
   gap: 0 2.5rem;
-  margin-bottom: 3.5rem;
+  margin-bottom: 0;
 }
 
 .holarchy-intro-left p {
@@ -978,9 +986,10 @@ nav.nav-collapsed.nav-open .nav-links {
 
 .orbit-hero {
   width: 100%;
-  max-width: 680px;
   aspect-ratio: 1;
-  margin: 0 auto 1rem;
+  margin: 0;
+  position: sticky;
+  top: 5rem;
 }
 
 
@@ -1510,9 +1519,10 @@ nav.nav-collapsed.nav-open .nav-links {
 
   .col4 { grid-template-columns: 1fr 1px 1fr; }
 
+  .holarchy-body { grid-template-columns: 1fr; gap: 2rem 0; }
+  .orbit-hero { position: static; max-width: 320px; margin: 0 auto; }
   .holarchy-intro { grid-template-columns: 1fr; gap: 2rem; }
   .holarchy-intro > .vdiv { display: none; }
-  .orbit-hero { max-width: 400px; }
 
   .footer { grid-template-columns: 1fr; gap: 1.5rem 0; }
   .footer > .vdiv { display: none; }
