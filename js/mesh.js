@@ -765,8 +765,10 @@ class GyroscopeAnimation {
   /* ── Main draw ── */
   draw(t) {
     const { ctx, bCtx, w, h } = this;
-    const cx = w * 0.63;
-    const cy = h / 2;
+    const wiggleX = Math.sin(t * 0.00028) * w * 0.012 + Math.sin(t * 0.00051) * w * 0.006;
+    const wiggleY = Math.cos(t * 0.00019) * h * 0.018 + Math.cos(t * 0.00037) * h * 0.008;
+    const cx = w * 0.63 + wiggleX;
+    const cy = h / 2 + wiggleY;
     const scale = Math.min(w, h);
     const dt = this.time ? Math.min(t - this.time, 50) : 16;
     const elapsed = t - this.startTime;
