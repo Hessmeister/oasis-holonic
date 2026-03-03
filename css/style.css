@@ -292,11 +292,10 @@ nav.nav-collapsed.nav-open .nav-links {
    ═══════════════════════════════════════ */
 
 .hero {
-  min-height: 67vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 2.5rem var(--page-pad) 0;
+  padding: 2.5rem var(--page-pad) 2.5rem;
   background: #1A1816;
   color: rgba(239, 236, 232, 0.9);
 }
@@ -345,7 +344,7 @@ nav.nav-collapsed.nav-open .nav-links {
 
 /* Mesh canvas container */
 .hero-mesh {
-  flex: 1;
+  height: 58vh;
   display: flex;
   position: relative;
   margin: 0 calc(-1 * var(--page-pad));
