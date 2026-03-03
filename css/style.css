@@ -346,9 +346,8 @@ nav.nav-collapsed.nav-open .nav-links {
 /* Mesh canvas container */
 .hero-mesh {
   flex: 1;
-  display: grid;
-  grid-template-columns: 46fr 54fr;
-  align-items: stretch;
+  display: flex;
+  position: relative;
   margin: 0 calc(-1 * var(--page-pad));
   opacity: 0;
   animation: heroFadeIn 1.5s ease 0.6s forwards;
@@ -356,8 +355,7 @@ nav.nav-collapsed.nav-open .nav-links {
 }
 
 .mesh-container {
-  width: 100%;
-  height: 100%;
+  flex: 1;
   position: relative;
 }
 
@@ -368,14 +366,16 @@ nav.nav-collapsed.nav-open .nav-links {
 }
 
 .mesh-overlay {
+  position: absolute;
+  bottom: 2.5rem;
+  left: var(--page-pad);
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   gap: 1.4rem;
-  padding: 0 2rem 3rem var(--page-pad);
+  max-width: 560px;
   color: rgba(239, 236, 232, 0.85);
   pointer-events: none;
-  z-index: 2;
 }
 
 .mesh-overlay .mo-headline {
@@ -1493,9 +1493,7 @@ nav.nav-collapsed.nav-open .nav-links {
 @media (max-width: 800px) {
   .hero-bottom { flex-wrap: wrap; gap: 1.25rem; }
   .hero-bottom .vdiv { display: none; }
-  .hero-mesh { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
-  .mesh-overlay { order: 2; padding: 2rem var(--page-pad) 1.5rem; justify-content: flex-start; }
-  .mesh-container { order: 1; min-height: 55vw; }
+  .mesh-overlay { max-width: 90vw; bottom: 1.5rem; left: var(--page-pad); }
 
   .section-head h2 { font-size: 2rem; }
 

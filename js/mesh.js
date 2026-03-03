@@ -433,67 +433,76 @@ class GyroscopeAnimation {
     ctx.restore();
 
     // ── Layer 3b: Solar flares / aurora tendrils ──
-    // Organic, irregular radiation — like orange northern lights
+    // Very tight to the surface, rotating slowly
     {
       ctx.save();
       ctx.globalCompositeOperation = 'lighter';
 
-      const flareTime = t * 0.00006;  // very slow drift
+      const flareTime = t * 0.00006;  // slow noise drift
       const flareRes = 128;            // smooth curves
       const flareSeeds = [7, 23, 41, 59]; // 4 overlapping layers
 
+      // Each layer rotates at a different speed for organic feel
+      const layerRotations = [
+        t * 0.00004,    // very slow CW
+        -t * 0.000028,  // slow CCW
+        t * 0.000018,   // slower CW
+        -t * 0.000012,  // slowest CCW
+      ];
+
       for (let layer = 0; layer < 4; layer++) {
         const seed = flareSeeds[layer];
-        // Each layer: different reach, speed, color temperature
-        const baseReach = r * (1.4 + layer * 0.8);
-        const flareExtra = r * (2.0 + layer * 1.4 + hbPulse * (1.5 + layer * 0.8));
-        const layerAlpha = (0.09 - layer * 0.015) * ci * b;
-        const timeOffset = layer * 3.7;  // desync layers
+        // Really tight — flares kiss the surface
+        const baseReach = r * (0.92 + layer * 0.06);
+        const flareExtra = r * (0.15 + layer * 0.08 + hbPulse * (0.12 + layer * 0.05));
+        const layerAlpha = (0.14 - layer * 0.02) * ci * b;
+        const timeOffset = layer * 3.7;
+        const rot = layerRotations[layer];  // rotation offset
 
         // Build smooth closed flare path
         ctx.beginPath();
         for (let i = 0; i <= flareRes; i++) {
           const angle = (i / flareRes) * TAU;
-          // Fewer angular cycles → broader, sweeping tendrils
-          const nFreq = 3 + layer;  // 3-6 lobes around the circle
+          const nFreq = 5 + layer;  // more lobes for tighter detail
           const n = smoothNoise(angle / TAU * nFreq, 3, seed, flareTime + timeOffset);
-          // Softer peaks for aurora-like wisps
           const tendril = Math.pow(n, 1.3);
           const dist = baseReach + tendril * flareExtra;
 
-          const fx = cx + Math.cos(angle) * dist;
-          const fy = cy + Math.sin(angle) * dist;
+          // Apply rotation to the whole flare shape
+          const rotAngle = angle + rot;
+          const fx = cx + Math.cos(rotAngle) * dist;
+          const fy = cy + Math.sin(rotAngle) * dist;
           if (i === 0) ctx.moveTo(fx, fy);
           else ctx.lineTo(fx, fy);
         }
         ctx.closePath();
 
-        // Radial gradient fill
+        // Radial gradient fill — tight around the surface
         const maxFlareR = baseReach + flareExtra;
-        const flareGrad = ctx.createRadialGradient(cx, cy, r * 0.6, cx, cy, maxFlareR);
+        const flareGrad = ctx.createRadialGradient(cx, cy, r * 0.7, cx, cy, maxFlareR);
 
         if (layer === 0) {
           // Bright warm orange — closest to core
-          flareGrad.addColorStop(0, `rgba(255,150,40,${layerAlpha * 1.8})`);
-          flareGrad.addColorStop(0.3, `rgba(255,110,15,${layerAlpha * 1.2})`);
-          flareGrad.addColorStop(0.6, `rgba(255,70,0,${layerAlpha * 0.5})`);
+          flareGrad.addColorStop(0, `rgba(255,150,40,${layerAlpha * 2.0})`);
+          flareGrad.addColorStop(0.35, `rgba(255,110,15,${layerAlpha * 1.4})`);
+          flareGrad.addColorStop(0.65, `rgba(255,70,0,${layerAlpha * 0.6})`);
           flareGrad.addColorStop(1, 'rgba(200,30,0,0)');
         } else if (layer === 1) {
           // Orange aurora wisps
-          flareGrad.addColorStop(0, `rgba(255,100,15,${layerAlpha * 1.5})`);
-          flareGrad.addColorStop(0.35, `rgba(255,70,0,${layerAlpha})`);
-          flareGrad.addColorStop(0.65, `rgba(220,40,0,${layerAlpha * 0.4})`);
+          flareGrad.addColorStop(0, `rgba(255,120,20,${layerAlpha * 1.6})`);
+          flareGrad.addColorStop(0.35, `rgba(255,80,5,${layerAlpha * 1.0})`);
+          flareGrad.addColorStop(0.65, `rgba(230,45,0,${layerAlpha * 0.4})`);
           flareGrad.addColorStop(1, 'rgba(160,15,0,0)');
         } else if (layer === 2) {
           // Deep red-orange tendrils
-          flareGrad.addColorStop(0, `rgba(230,60,5,${layerAlpha * 1.2})`);
-          flareGrad.addColorStop(0.4, `rgba(200,35,0,${layerAlpha * 0.7})`);
-          flareGrad.addColorStop(1, 'rgba(120,8,0,0)');
+          flareGrad.addColorStop(0, `rgba(240,75,10,${layerAlpha * 1.3})`);
+          flareGrad.addColorStop(0.4, `rgba(210,40,0,${layerAlpha * 0.8})`);
+          flareGrad.addColorStop(1, 'rgba(130,10,0,0)');
         } else {
-          // Outermost: faint deep red wisps reaching far
-          flareGrad.addColorStop(0, `rgba(200,40,0,${layerAlpha})`);
-          flareGrad.addColorStop(0.5, `rgba(150,15,0,${layerAlpha * 0.4})`);
-          flareGrad.addColorStop(1, 'rgba(80,5,0,0)');
+          // Outermost: faint deep red corona wisps
+          flareGrad.addColorStop(0, `rgba(210,50,5,${layerAlpha * 1.1})`);
+          flareGrad.addColorStop(0.5, `rgba(160,20,0,${layerAlpha * 0.5})`);
+          flareGrad.addColorStop(1, 'rgba(90,5,0,0)');
         }
 
         ctx.fillStyle = flareGrad;
@@ -756,7 +765,7 @@ class GyroscopeAnimation {
   /* ── Main draw ── */
   draw(t) {
     const { ctx, bCtx, w, h } = this;
-    const cx = w / 2;
+    const cx = w * 0.63;
     const cy = h / 2;
     const scale = Math.min(w, h);
     const dt = this.time ? Math.min(t - this.time, 50) : 16;
@@ -765,7 +774,7 @@ class GyroscopeAnimation {
     this._update(t, dt, elapsed);
 
     // Clear
-    ctx.fillStyle = '#0C0C0E';
+    ctx.fillStyle = '#1A1816';
     ctx.fillRect(0, 0, w, h);
 
     // Ring bloom
