@@ -142,10 +142,30 @@ function initBuildChat() {
   });
 }
 
+// ── Gallery filter ──
+function initGalleryFilter() {
+  const filterBtns = document.querySelectorAll('.gf-btn');
+  const cards = document.querySelectorAll('.gallery-card');
+  if (!filterBtns.length) return;
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('is-active'));
+      btn.classList.add('is-active');
+
+      const filter = btn.dataset.filter;
+      cards.forEach(card => {
+        card.style.display = (filter === 'all' || card.dataset.category === filter) ? '' : 'none';
+      });
+    });
+  });
+}
+
 // ── Boot ──
 function _init_main() {
   initNav();
   initBuildChat();
+  initGalleryFilter();
   if (!prefersReducedMotion) {
     initReveals();
   }
