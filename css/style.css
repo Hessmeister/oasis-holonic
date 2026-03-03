@@ -292,6 +292,7 @@ nav.nav-collapsed.nav-open .nav-links {
    ═══════════════════════════════════════ */
 
 .hero {
+  min-height: 80vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -344,7 +345,7 @@ nav.nav-collapsed.nav-open .nav-links {
 
 /* Mesh canvas container */
 .hero-mesh {
-  height: 67vh;
+  flex: 1;
   display: flex;
   position: relative;
   margin: 0 calc(-1 * var(--page-pad));
