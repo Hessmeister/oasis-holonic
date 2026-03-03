@@ -292,11 +292,11 @@ nav.nav-collapsed.nav-open .nav-links {
    ═══════════════════════════════════════ */
 
 .hero {
-  min-height: 82vh;
+  min-height: 72vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 3.5rem var(--page-pad) 1.5rem;
+  padding: 2.5rem var(--page-pad) 1rem;
   background: #1A1816;
   color: rgba(239, 236, 232, 0.9);
 }
