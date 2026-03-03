@@ -367,7 +367,8 @@ nav.nav-collapsed.nav-open .nav-links {
 
 .mesh-overlay {
   position: absolute;
-  bottom: 2.5rem;
+  top: 50%;
+  transform: translateY(-50%);
   left: var(--page-pad);
   z-index: 2;
   display: flex;
