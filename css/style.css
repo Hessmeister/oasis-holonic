@@ -186,8 +186,8 @@ nav {
 .nav-logo::after {
   content: '';
   position: absolute;
-  left: 23px;
-  top: 18px;
+  left: 30px;
+  top: 19px;
   width: 8px;
   height: 8px;
   border-radius: 50%;
