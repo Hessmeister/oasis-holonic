@@ -184,7 +184,7 @@ nav {
 
 /* Inline SVG wordmark */
 .nav-logo-svg {
-  height: 1.5rem;
+  height: 1.15rem;
   width: auto;
   display: block;
   color: var(--black);
