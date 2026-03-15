@@ -21,17 +21,21 @@ class FlowAnimation {
     this._litState = {};
 
     // Nodes — positioned as ratios
+    // Blockchains top row, OASIS API centre, others bottom row
     this.nodes = [
-      { x: 0.12, y: 0.50, label: 'Holochain', shape: 'hex' },
-      { x: 0.35, y: 0.28, label: 'Ethereum',  shape: 'circle' },
-      { x: 0.50, y: 0.65, label: 'OASIS API', shape: 'square' },
-      { x: 0.65, y: 0.35, label: 'MongoDB',   shape: 'circle' },
-      { x: 0.88, y: 0.50, label: 'IPFS',      shape: 'hex' },
+      { x: 0.18, y: 0.22, label: 'Ethereum',  shape: 'circle' },
+      { x: 0.50, y: 0.12, label: 'Solana',    shape: 'circle' },
+      { x: 0.82, y: 0.22, label: 'Base',      shape: 'circle' },
+      { x: 0.50, y: 0.54, label: 'OASIS API', shape: 'square' },
+      { x: 0.12, y: 0.82, label: 'Holochain', shape: 'hex'    },
+      { x: 0.50, y: 0.88, label: 'MongoDB',   shape: 'circle' },
+      { x: 0.88, y: 0.82, label: 'IPFS',      shape: 'hex'    },
     ];
 
     // Connections between nodes (index pairs)
     this.edges = [
-      [0, 1], [0, 2], [1, 2], [1, 3], [2, 3], [3, 4], [2, 4]
+      [0, 3], [1, 3], [2, 3], [3, 4], [3, 5], [3, 6],
+      [0, 1], [1, 2], [4, 5], [5, 6]
     ];
 
     this.resize();
@@ -41,7 +45,7 @@ class FlowAnimation {
   resize() {
     const parent = this.canvas.parentElement;
     this.w = parent.offsetWidth;
-    this.h = Math.min(this.w * 0.4, 280);
+    this.h = Math.min(this.w * 0.50, 340);
     this.canvas.width = this.w * this.dpr;
     this.canvas.height = this.h * this.dpr;
     this.canvas.style.width = this.w + 'px';
