@@ -182,6 +182,17 @@
 
   document.querySelectorAll('.pd-feature').forEach(el => featObs.observe(el));
 
+  // ── Mouseover activation ───────────────────────────────────────────────
+  document.querySelectorAll('.pd-feature').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      const idx = parseInt(el.dataset.featureIndex, 10);
+      anim.setFeature(idx);
+      document.querySelectorAll('.pd-feature').forEach((f, i) => {
+        f.classList.toggle('is-active', i === idx);
+      });
+    });
+  });
+
   // ── IntersectionObserver: pause animation when off-screen ──────────────
   const visObs = new IntersectionObserver((entries) => {
     entries.forEach(e => {

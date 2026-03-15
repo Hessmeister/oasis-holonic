@@ -1680,9 +1680,11 @@ nav.nav-collapsed.nav-open .nav-links .nav-btn {
   border-radius: 3px;
   padding: 1.5rem;
   transition: border-color 0.3s;
+  text-decoration: none;
+  cursor: pointer;
 }
 
-.gallery-card:hover { border-color: var(--orange); }
+.gallery-card:hover { border-color: rgb(var(--gc-accent, 255,107,26)); }
 
 .gc-top { margin-bottom: 0.75rem; }
 
@@ -1691,7 +1693,7 @@ nav.nav-collapsed.nav-open .nav-links .nav-btn {
   font-weight: 600;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  color: var(--orange);
+  color: rgb(var(--gc-accent, 255,107,26));
 }
 
 .gc-title {
@@ -1741,13 +1743,13 @@ nav.nav-collapsed.nav-open .nav-links .nav-btn {
 .gc-link {
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--orange);
+  color: rgb(var(--gc-accent, 255,107,26));
   text-decoration: none;
   letter-spacing: 0.01em;
   transition: opacity 0.25s;
 }
 
-.gc-link:hover { opacity: 0.7; }
+.gallery-card:hover .gc-link { opacity: 0.7; }
 
 .gc-deploy-soon {
   font-size: 0.62rem;
