@@ -74,7 +74,7 @@ class OrbitAnimation {
 
   getBodyPos(body, t) {
     const cx = this.size / 2;
-    const cy = this.size * 0.32;
+    const cy = this.size * 0.50;
     if (body.orbit === 0) return { x: cx, y: cy };
     let parentX = cx, parentY = cy;
     if (body.parent !== undefined) {
@@ -99,7 +99,7 @@ class OrbitAnimation {
   draw(t) {
     const { ctx, size } = this;
     const cx = size / 2;
-    const cy = size * 0.42;
+    const cy = size * 0.50;
     const rp = this.revealProgress;
     const isLooping = this.revealed && rp >= 1;
 
