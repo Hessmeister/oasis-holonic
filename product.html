@@ -91,6 +91,7 @@
 
   if (!product) {
     location.replace('index.html#gallery');
+    throw new Error(`Unknown product slug: ${slug}`);
   }
 
   // ── Populate hero ────────────────────────────────────────────────────────
