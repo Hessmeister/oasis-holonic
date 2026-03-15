@@ -252,17 +252,23 @@ function _draw(t) {
     const fullText   = typingLabel.lines.join(' ');
     const totalChars = Math.floor(fullText.length * typingLabel.progress);
     const cursorOn   = typingLabel.progress < 1 || Math.sin(t * 0.006) > 0;
-    const lineH      = 14;
-    const startY     = y - size_for_typing() - 14 - (typingLabel.lines.length - 1) * lineH;
+
+    /* Positioned between top-left agent and center hub */
+    const hubPos     = _nodePos(4);
+    const midY       = (y + hubPos.y) * 0.48;
+    const midX       = (x + hubPos.x) * 0.5;
+    const fontSize   = Math.max(12, Math.min(14, w * 0.028));
+    const lineH      = fontSize * 1.5;
+    const startY     = midY - ((typingLabel.lines.length - 1) * lineH) / 2;
 
     ctx.save();
-    ctx.font         = '400 10px "SF Mono", "Fira Code", Menlo, monospace';
-    ctx.textAlign    = 'left';
-    ctx.textBaseline = 'bottom';
-    ctx.fillStyle    = 'rgba(255,255,255,0.65)';
+    ctx.font         = `400 ${fontSize}px "SF Mono", "Fira Code", Menlo, monospace`;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle    = 'rgba(255,255,255,0.72)';
 
     let charsUsed = 0;
-    let lastLineWidth = 0;
+    let lastVisibleTxt = '';
     let lastLineY = startY;
 
     for (let l = 0; l < typingLabel.lines.length; l++) {
@@ -271,30 +277,22 @@ function _draw(t) {
       const txt = line.slice(0, visible);
       const lineY = startY + l * lineH;
 
-      /* Center the text block above the node */
-      const fullW = ctx.measureText(line).width;
-      const lx = x - fullW / 2;
-      ctx.fillText(txt, lx, lineY);
+      ctx.fillText(txt, midX, lineY);
 
-      lastLineWidth = ctx.measureText(txt).width;
+      lastVisibleTxt = txt;
       lastLineY = lineY;
       charsUsed += line.length;
     }
 
     /* Blinking cursor */
-    if (cursorOn) {
-      const lastLine = typingLabel.lines[typingLabel.lines.length - 1];
-      const fullW = ctx.measureText(lastLine).width;
-      const lx = _nodePos(0).x - fullW / 2;
+    if (cursorOn && lastVisibleTxt.length > 0) {
+      const cursorX = midX + ctx.measureText(lastVisibleTxt).width / 2 + 2;
       ctx.fillStyle = 'rgba(255,107,26,0.9)';
-      ctx.fillText('▌', lx + lastLineWidth, lastLineY);
+      ctx.fillText('▌', cursorX, lastLineY);
     }
     ctx.restore();
   }
 }
-
-/* Helper for typing text vertical offset */
-function size_for_typing() { return 10; }
 
 const _loop = (timestamp) => {
   if (!running) return;
