@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OASIS</title>
+  <meta name="description" content="OASIS product detail">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Newsreader:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/product.css">
+  <link rel="icon" type="image/svg+xml" href="img/oasis-icon-light.svg" media="(prefers-color-scheme: light)">
+  <link rel="icon" type="image/svg+xml" href="img/oasis-icon-dark.svg" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/svg+xml" href="img/oasis-icon-light.svg">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="pd-nav">
+  <a href="index.html" class="pd-nav-logo" aria-label="OASIS home">
+    <svg class="nav-logo-svg" viewBox="0 0 550 149" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="OASIS" role="img">
+      <path d="M69.4925 20.4674H84.4214C116.226 20.4674 133.914 38.6417 133.914 75.4771C133.914 112.15 116.389 130 84.4214 130H69.4925C37.5252 130 20 112.15 20 75.4771C20 38.6417 37.6875 20.4674 69.4925 20.4674ZM84.4214 39.6153H69.4925C48.3974 39.6153 39.1479 50.3251 39.1479 75.4771C39.1479 100.467 48.2351 110.852 69.4925 110.852H84.4214C105.517 110.852 114.604 100.467 114.604 75.3148C114.604 50.3251 105.517 39.6153 84.4214 39.6153Z" fill="currentColor"/>
+      <path d="M195.795 41.8871L161.069 130H139.974L178.432 32.6376C182.489 22.4146 189.953 18.5201 201.474 18.5201C212.833 18.5201 220.298 22.4146 224.192 32.6376L261.19 130H239.932L206.667 41.8871C205.693 39.2907 203.908 38.1548 201.312 38.1548C198.716 38.1548 196.931 39.2907 195.795 41.8871Z" fill="currentColor"/>
+      <path d="M306.493 20.4674H361.989V39.6153H305.843C295.945 39.6153 291.564 44.9702 291.564 52.5969C291.564 59.25 294.971 65.5786 307.791 65.5786H333.429C363.287 65.5786 370.265 82.1302 370.265 97.8704C370.265 116.369 360.366 130 335.377 130H274.363V110.852H336.026C346.411 110.852 351.117 105.173 351.117 97.2213C351.117 90.0814 347.385 83.5906 333.916 83.5906H308.44C279.231 83.5906 272.416 67.2013 272.416 51.9478C272.416 33.7735 282.152 20.4674 306.493 20.4674Z" fill="currentColor"/>
+      <path d="M391.543 20.4674H410.691V130H391.543V20.4674Z" fill="currentColor"/>
+      <path d="M466.228 20.4674H521.724V39.6153H465.579C455.68 39.6153 451.299 44.9702 451.299 52.5969C451.299 59.25 454.706 65.5786 467.526 65.5786H493.165C523.022 65.5786 530 82.1302 530 97.8704C530 116.369 520.101 130 495.112 130H434.098V110.852H495.761C506.146 110.852 510.852 105.173 510.852 97.2213C510.852 90.0814 507.12 83.5906 493.651 83.5906H468.175C438.966 83.5906 432.151 67.2013 432.151 51.9478C432.151 33.7735 441.887 20.4674 466.228 20.4674Z" fill="currentColor"/>
+      <circle cx="200.746" cy="111.116" r="18.8842" fill="#FF5E00"/>
+      <circle cx="200.746" cy="111.116" r="18.8842" fill="#FF5E00"/>
+    </svg>
+  </a>
+  <a href="index.html#gallery" class="pd-back">← Products</a>
+</nav>
+
+<!-- HERO -->
+<section class="pd-hero">
+  <div class="pd-hero-text">
+    <span id="pd-category" class="pd-category"></span>
+    <h1 id="pd-tagline" class="pd-tagline"></h1>
+    <p id="pd-description" class="pd-description"></p>
+  </div>
+</section>
+
+<!-- STICKY SPLIT -->
+<div class="pd-split">
+  <div class="pd-left" id="pd-features"></div>
+  <div class="pd-right">
+    <canvas id="pd-canvas"></canvas>
+  </div>
+</div>
+
+<!-- CTA STRIP -->
+<section class="pd-cta" id="pd-cta">
+  <a id="pd-docs-btn"   href="#" class="pd-cta-btn pd-cta-btn--primary">Docs →</a>
+  <a id="pd-github-btn" href="#" class="pd-cta-btn pd-cta-btn--ghost">GitHub →</a>
+</section>
+
+<!-- FOOTER -->
+<div class="footer reveal">
+  <div class="footer-col">
+    <span class="footer-label">Project</span>
+    <span class="footer-value">OASIS: Open Advanced<br>Scalable Interoperable System</span>
+  </div>
+  <div class="vdiv"></div>
+  <div class="footer-col">
+    <span class="footer-label">Source</span>
+    <span class="footer-value"><a href="https://github.com/NextGenSoftwareUK/OASIS" target="_blank">github.com/NextGenSoftwareUK/OASIS</a></span>
+  </div>
+  <div class="vdiv"></div>
+  <div class="footer-col">
+    <span class="footer-label">By</span>
+    <span class="footer-value">NextGen Software<br>2025</span>
+  </div>
+  <div class="vdiv"></div>
+  <div class="footer-col">
+    <span class="footer-label">Community</span>
+    <span class="footer-value">
+      <a href="https://x.com/oasisweb4" target="_blank">X / Twitter</a><br>
+      <a href="https://discord.gg/RU6Z8YJ" target="_blank">Discord</a><br>
+      <a href="https://t.me/oasisweb4chat" target="_blank">Telegram</a>
+    </span>
+  </div>
+</div>
+
+<script type="module">
+  import { PRODUCTS } from './js/products.js';
+
+  // ── Route ────────────────────────────────────────────────────────────────
+  const slug    = new URLSearchParams(location.search).get('p');
+  const product = PRODUCTS[slug];
+
+  if (!product) {
+    location.replace('index.html#gallery');
+  }
+
+  // ── Populate hero ────────────────────────────────────────────────────────
+  document.title = `OASIS — ${product.name}`;
+  document.getElementById('pd-category').textContent    = product.category;
+  document.getElementById('pd-tagline').innerHTML       = product.tagline;
+  document.getElementById('pd-description').textContent = product.description;
+
+  // ── Build feature list ───────────────────────────────────────────────────
+  const featuresEl = document.getElementById('pd-features');
+  product.features.forEach((f, i) => {
+    const div = document.createElement('div');
+    div.className = 'pd-feature';
+    div.dataset.featureIndex = i;
+
+    const codeBlock = f.code
+      ? `<pre class="pd-feature-code"><code>${escHtml(f.code)}</code></pre>`
+      : '';
+
+    div.innerHTML = `
+      <h3 class="pd-feature-heading">${f.heading}</h3>
+      <p class="pd-feature-body">${f.body}</p>
+      ${codeBlock}
+    `;
+    featuresEl.appendChild(div);
+  });
+
+  // ── CTA links ────────────────────────────────────────────────────────────
+  const docsBtn   = document.getElementById('pd-docs-btn');
+  const githubBtn = document.getElementById('pd-github-btn');
+
+  if (product.links.docs)   { docsBtn.href   = product.links.docs;   }
+  else                      { docsBtn.style.display   = 'none';        }
+  if (product.links.github) { githubBtn.href = product.links.github; }
+  else                      { githubBtn.style.display = 'none';        }
+
+  // ── Load animation ───────────────────────────────────────────────────────
+  const canvas = document.getElementById('pd-canvas');
+  const anim   = await import(`./js/anim/${product.animation}.js`);
+  anim.init(canvas);
+  anim.start();
+
+  // ── IntersectionObserver: feature scroll → setFeature ───────────────────
+  const featObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const idx = parseInt(e.target.dataset.featureIndex, 10);
+      anim.setFeature(idx);
+      document.querySelectorAll('.pd-feature').forEach((el, i) => {
+        el.classList.toggle('is-active', i === idx);
+      });
+    });
+  }, {
+    threshold: 0.4,
+    rootMargin: '-15% 0px -15% 0px',
+  });
+
+  document.querySelectorAll('.pd-feature').forEach(el => featObs.observe(el));
+
+  // ── IntersectionObserver: pause animation when off-screen ────────────────
+  const visObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) anim.start(); else anim.stop();
+    });
+  }, { threshold: 0 });
+  visObs.observe(canvas);
+
+  // ── Utility ──────────────────────────────────────────────────────────────
+  function escHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+</script>
+
+</body>
+</html>
