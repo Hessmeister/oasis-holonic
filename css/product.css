@@ -1,7 +1,13 @@
 /* ═══════════════════════════════════════
    product.css — Product detail page styles
    Swiss editorial · Sticky-split layout
+   Per-product accent color via --pd-accent
    ═══════════════════════════════════════ */
+
+:root {
+  --pd-accent: var(--orange);
+  --pd-accent-rgb: 255,107,26;
+}
 
 /* ── Product nav ─────────────────────────────────────────────────────────── */
 .pd-nav {
@@ -42,7 +48,7 @@
   text-decoration: none;
   transition: color 0.3s;
 }
-.pd-back:hover { color: var(--orange); }
+.pd-back:hover { color: var(--pd-accent); }
 
 
 /* ── Hero ─────────────────────────────────────────────────────────────────── */
@@ -84,7 +90,7 @@
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--orange);
+  color: var(--pd-accent);
   margin-bottom: 1.2rem;
 }
 
@@ -103,7 +109,7 @@
   font-weight: 400;
   font-style: italic;
   letter-spacing: -0.01em;
-  color: var(--orange);
+  color: var(--pd-accent);
 }
 
 .pd-description {
@@ -140,7 +146,7 @@
 .pd-meta-label {
   font-size: 0.6rem;
   font-weight: 600;
-  color: var(--orange);
+  color: var(--pd-accent);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -217,7 +223,7 @@
 }
 
 .pd-feature.is-active {
-  border-left-color: var(--orange);
+  border-left-color: var(--pd-accent);
 }
 
 .pd-feature-heading {
@@ -274,9 +280,9 @@
   border-radius: 0;
 }
 
-/* Syntax hint — orange highlights for key tokens */
+/* Syntax hint — accent highlights for key tokens */
 .pd-feature-code .token-key {
-  color: var(--orange);
+  color: var(--pd-accent);
 }
 
 
@@ -313,7 +319,7 @@
   transform: translateX(-50%);
   width: 100vw;
   height: 3px;
-  background: var(--orange);
+  background: var(--pd-accent);
   z-index: 0;
 }
 
@@ -331,14 +337,14 @@
 }
 
 .pd-cta-btn--primary {
-  background: var(--orange);
+  background: var(--pd-accent);
   color: #fff;
-  border: 1px solid var(--orange);
+  border: 1px solid var(--pd-accent);
 }
 
 .pd-cta-btn--primary:hover {
   background: #fff;
-  color: var(--orange);
+  color: var(--pd-accent);
   border-color: #fff;
 }
 

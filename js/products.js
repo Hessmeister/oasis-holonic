@@ -12,6 +12,7 @@ export const PRODUCTS = {
     description: 'Every OASIS capability — NFT minting, wallet management, smart contracts, data operations — is available through natural language. The MCP Server exposes 60+ tools to any AI agent or IDE that speaks the Model Context Protocol.',
     tags: ['MCP', 'AI Agents', 'Natural Language', 'A2A'],
     animation: 'mcp',
+    accent: '255,107,26',
     features: [
       {
         id: 'tools',
@@ -49,7 +50,8 @@ export const PRODUCTS = {
     tagline: 'Generate <em>OAPPs</em> from the command line',
     description: 'Low/no-code generator for OAPPs, metaverses, and holonic games. Scaffold a full OASIS application in one command.',
     tags: ['CLI', 'Code Generation', 'Scaffold', 'OAPP'],
-    animation: 'mcp',
+    animation: 'star-cli',
+    accent: '0,201,219',
     features: [
       {
         id: 'scaffold',
@@ -85,7 +87,8 @@ export const PRODUCTS = {
     tagline: 'One avatar, <em>everywhere</em>',
     description: 'Unified avatar, karma, wallet, and keys across every OASIS application. Log in once and your identity follows you.',
     tags: ['Avatar', 'Karma', 'SSO', 'Cross-app'],
-    animation: 'mcp',
+    animation: 'identity',
+    accent: '167,139,250',
     features: [
       {
         id: 'avatar',
@@ -119,7 +122,8 @@ export const PRODUCTS = {
     tagline: 'Mint once, <em>own everywhere</em>',
     description: 'Cross-chain NFT minting with automatic replication. One mint call, every chain.',
     tags: ['NFTs', 'Cross-chain', 'Replication', 'ERC-721'],
-    animation: 'mcp',
+    animation: 'nfts',
+    accent: '244,114,182',
     features: [
       {
         id: 'mint',
@@ -153,7 +157,8 @@ export const PRODUCTS = {
     tagline: 'Write once, <em>deploy everywhere</em>',
     description: 'Write contract logic once and deploy to Ethereum, Solana, and Radix simultaneously via OASIS provider abstraction.',
     tags: ['Solidity', 'Rust', 'Multi-chain', 'Deploy'],
-    animation: 'mcp',
+    animation: 'smart-contracts',
+    accent: '245,158,11',
     features: [
       {
         id: 'write-once',
@@ -187,7 +192,8 @@ export const PRODUCTS = {
     tagline: 'Atomic swaps, <em>real-time rates</em>',
     description: 'Cross-chain asset transfers with atomic swap guarantees and live exchange rates.',
     tags: ['Bridge', 'Atomic Swap', 'DeFi', 'Cross-chain'],
-    animation: 'mcp',
+    animation: 'bridge',
+    accent: '52,211,153',
     features: [
       {
         id: 'atomic',
@@ -221,7 +227,8 @@ export const PRODUCTS = {
     tagline: 'Holonic routing, <em>zero downtime</em>',
     description: 'Automatic replication and failover across MongoDB, IPFS, Holochain, and cloud providers.',
     tags: ['MongoDB', 'IPFS', 'Holochain', 'Replication'],
-    animation: 'mcp',
+    animation: 'data-storage',
+    accent: '56,189,248',
     features: [
       {
         id: 'routing',
@@ -255,7 +262,8 @@ export const PRODUCTS = {
     tagline: 'SDKs for <em>every stack</em>',
     description: 'SDKs, Web Kits, and framework integrations for .NET, Node.js, Unity, and more.',
     tags: ['.NET SDK', 'Node.js', 'Unity', 'REST API'],
-    animation: 'mcp',
+    animation: 'infrastructure',
+    accent: '251,146,60',
     features: [
       {
         id: 'sdks',

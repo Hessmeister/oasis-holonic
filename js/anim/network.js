@@ -1,6 +1,7 @@
 /* ═══════════════════════════════════════
-   js/anim/mcp.js — MCP Server animation
-   Exported interface: init · setFeature · start · stop
+   js/anim/network.js — Configurable network animation engine
+   Used by all product pages except MCP Server (which has its own bespoke anim).
+   Exported interface: init · configure · setFeature · start · stop
    ═══════════════════════════════════════ */
 
 let canvas, ctx, w, h, dpr;
@@ -8,20 +9,9 @@ let running = false;
 let particles = [];
 let state = -1;
 let _litState = {};
-let typingLabel = null;
-let agentLabels = ['Agent', 'Agent', 'Agent', 'Agent'];
+let config = null;
 
-/* Node positions inset from edges so labels have room */
-const NODE_DEFS = [
-  { rx: 0.18, ry: 0.18, shape: 'diamond', agentIdx: 0 },
-  { rx: 0.82, ry: 0.18, shape: 'diamond', agentIdx: 1 },
-  { rx: 0.18, ry: 0.82, shape: 'diamond', agentIdx: 2 },
-  { rx: 0.82, ry: 0.82, shape: 'diamond', agentIdx: 3 },
-  { rx: 0.50, ry: 0.50, shape: 'square',  agentIdx: null },
-];
-
-const HUB_EDGES  = [[0,4],[1,4],[2,4],[3,4]];
-const PEER_EDGES = [[0,1],[0,2],[1,3],[2,3]];
+/* ── Public API ── */
 
 export function init(c) {
   canvas = c;
@@ -31,32 +21,27 @@ export function init(c) {
   window.addEventListener('resize', _resize);
 }
 
+export function configure(cfg) {
+  config = cfg;
+}
+
 export function setFeature(index) {
   state = index;
   particles = [];
-  typingLabel = null;
+  _litState = {};
 
-  if (index === 3) {
-    agentLabels = ['Cursor', 'VS Code', 'Windsurf', 'Claude'];
-  } else {
-    agentLabels = ['Agent', 'Agent', 'Agent', 'Agent'];
-  }
+  if (!config) return;
 
-  if (index === 0) {
-    HUB_EDGES.forEach(([from, to], i) => {
-      for (let j = 0; j < 6; j++) {
-        _spawnAt(from, to, (i * 60 + j * 25) / 1000);
-      }
-    });
-  }
+  const feat = config.features[index];
+  if (!feat) return;
 
-  if (index === 1) {
-    typingLabel = {
-      lines: ['"Mint an NFT on Ethereum', 'and replicate to Solana"'],
-      progress: 0,
-      sent: false
-    };
-  }
+  /* Spawn initial particles along highlighted edges */
+  const edges = feat.activeEdges || config.edges;
+  edges.forEach(([from, to], i) => {
+    for (let j = 0; j < 4; j++) {
+      _spawnAt(from, to, (i * 50 + j * 30) / 1000);
+    }
+  });
 }
 
 export function start() {
@@ -68,6 +53,8 @@ export function start() {
 export function stop() {
   running = false;
 }
+
+/* ── Internal ── */
 
 function _resize() {
   const rect = canvas.getBoundingClientRect();
@@ -81,7 +68,8 @@ function _resize() {
 }
 
 function _nodePos(i) {
-  const n = NODE_DEFS[i];
+  if (!config) return { x: 0, y: 0 };
+  const n = config.nodes[i];
   return { x: n.rx * w, y: n.ry * h };
 }
 
@@ -89,8 +77,8 @@ function _spawnAt(from, to, delay = 0) {
   particles.push({
     from, to,
     t: -delay,
-    speed: 0.0025 + Math.random() * 0.003,
-    size: 2 + Math.random() * 1.5,
+    speed: 0.002 + Math.random() * 0.003,
+    size: 1.5 + Math.random() * 1.5,
   });
 }
 
@@ -104,6 +92,20 @@ function _drawShape(x, y, shape, size) {
     ctx.closePath();
   } else if (shape === 'square') {
     ctx.rect(x - size * 0.9, y - size * 0.9, size * 1.8, size * 1.8);
+  } else if (shape === 'hexagon') {
+    const a = size;
+    for (let i = 0; i < 6; i++) {
+      const ang = Math.PI / 3 * i - Math.PI / 6;
+      const px = x + a * Math.cos(ang);
+      const py = y + a * Math.sin(ang);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+  } else if (shape === 'triangle') {
+    ctx.moveTo(x, y - size * 1.2);
+    ctx.lineTo(x + size * 1.1, y + size * 0.7);
+    ctx.lineTo(x - size * 1.1, y + size * 0.7);
+    ctx.closePath();
   } else {
     ctx.arc(x, y, size, 0, Math.PI * 2);
   }
@@ -139,64 +141,53 @@ function _litVal(nodeIdx, isHit, t) {
 }
 
 function _draw(t) {
+  if (!config) return;
   ctx.clearRect(0, 0, w, h);
 
-  const isPeer = state === 2;
+  const accent = config.accent || '255,107,26';
+  const feat = config.features[state] || {};
+  const activeEdges = feat.activeEdges || [];
+  const activeEdgeSet = new Set(activeEdges.map(e => e[0] + '-' + e[1]));
+  const activeNodeSet = new Set(feat.activeNodes || []);
 
   /* ── Edges ── */
-  HUB_EDGES.forEach(([a, b]) => {
+  config.edges.forEach(([a, b]) => {
     const pa = _nodePos(a), pb = _nodePos(b);
+    const isActive = activeEdgeSet.has(a + '-' + b) || activeEdgeSet.has(b + '-' + a);
     ctx.beginPath();
     ctx.moveTo(pa.x, pa.y);
     ctx.lineTo(pb.x, pb.y);
-    ctx.strokeStyle = isPeer ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.18)';
-    ctx.lineWidth = 1;
-    ctx.stroke();
-  });
-
-  PEER_EDGES.forEach(([a, b]) => {
-    const pa = _nodePos(a), pb = _nodePos(b);
-    ctx.beginPath();
-    ctx.moveTo(pa.x, pa.y);
-    ctx.lineTo(pb.x, pb.y);
-    ctx.strokeStyle = isPeer ? 'rgba(255,107,26,0.45)' : 'rgba(255,255,255,0.04)';
-    ctx.lineWidth   = isPeer ? 1.5 : 1;
+    ctx.strokeStyle = isActive
+      ? `rgba(${accent},0.50)`
+      : 'rgba(255,255,255,0.10)';
+    ctx.lineWidth = isActive ? 1.5 : 1;
     ctx.stroke();
   });
 
   /* ── Ambient particles ── */
-  if (state !== 0 && Math.random() < 0.028) {
-    const pool = isPeer ? PEER_EDGES : HUB_EDGES;
+  if (Math.random() < 0.025) {
+    const pool = activeEdges.length > 0 ? activeEdges : config.edges;
     const e    = pool[Math.floor(Math.random() * pool.length)];
     const rev  = Math.random() > 0.5;
     _spawnAt(rev ? e[1] : e[0], rev ? e[0] : e[1]);
-  }
-
-  /* ── Typing animation (state 1) ── */
-  if (state === 1 && typingLabel) {
-    typingLabel.progress = Math.min(typingLabel.progress + 0.006, 1);
-    if (typingLabel.progress >= 1 && !typingLabel.sent) {
-      typingLabel.sent = true;
-      _spawnAt(0, 4);
-      setTimeout(() => _spawnAt(4, 0), 700);
-    }
   }
 
   particles = particles.filter(p => p.t <= 1.05);
   particles.forEach(p => { p.t += p.speed; });
 
   /* ── Nodes ── */
-  NODE_DEFS.forEach((node, i) => {
+  config.nodes.forEach((node, i) => {
     const { x, y } = _nodePos(i);
-    const isHub = i === 4;
-    const size  = isHub ? 12 : 10;
-    const isHit = _particleNearNode(i);
-    const lit   = _litVal(i, isHit, t);
+    const isHub   = node.isHub;
+    const size    = node.size || (isHub ? 13 : 10);
+    const isHit   = _particleNearNode(i);
+    const lit     = _litVal(i, isHit, t);
+    const isHighlighted = activeNodeSet.has(i) || isHub;
 
     /* Glow */
     if (lit > 0.05) {
       const gc  = ctx.createRadialGradient(x, y, 0, x, y, size * 4);
-      const col = isHub ? '255,107,26' : '255,255,255';
+      const col = isHub ? accent : '255,255,255';
       gc.addColorStop(0, `rgba(${col},${0.22 * lit})`);
       gc.addColorStop(1, 'rgba(0,0,0,0)');
       ctx.fillStyle = gc;
@@ -204,19 +195,26 @@ function _draw(t) {
     }
 
     /* Shape */
-    _drawShape(x, y, node.shape, size);
+    _drawShape(x, y, node.shape || 'circle', size);
+    const baseAlpha = isHighlighted ? 0.65 : 0.35;
     ctx.strokeStyle = isHub
-      ? `rgba(255,107,26,${0.65 + lit*0.35})`
-      : `rgba(255,255,255,${0.50 + lit*0.50})`;
+      ? `rgba(${accent},${baseAlpha + lit*0.35})`
+      : `rgba(255,255,255,${baseAlpha + lit*0.50})`;
     ctx.lineWidth = 1.2 + lit * 0.8;
     ctx.stroke();
 
+    /* Fill for hub */
+    if (isHub) {
+      ctx.fillStyle = `rgba(${accent},${0.08 + lit * 0.12})`;
+      ctx.fill();
+    }
+
     /* Label */
-    const label  = isHub ? 'OASIS API' : agentLabels[node.agentIdx];
-    const labelA = 0.60 + lit * 0.40;
+    const label  = node.label;
+    const labelA = isHighlighted ? 0.60 + lit * 0.40 : 0.30 + lit * 0.40;
     const weight = lit > 0.3 ? 600 : 400;
     const fSize  = 11 + lit * 2;
-    const above  = (i === 0 || i === 1);
+    const above  = node.labelAbove !== undefined ? node.labelAbove : (node.ry < 0.5);
     const ly     = above ? y - size - 12 : y + size + 14;
 
     ctx.save();
@@ -224,7 +222,7 @@ function _draw(t) {
       ctx.shadowColor = `rgba(255,255,255,${0.6 * lit})`;
       ctx.shadowBlur  = 12 * lit;
     }
-    ctx.fillStyle    = isHub ? `rgba(255,107,26,${labelA})` : `rgba(255,255,255,${labelA})`;
+    ctx.fillStyle    = isHub ? `rgba(${accent},${labelA})` : `rgba(255,255,255,${labelA})`;
     ctx.font         = `${weight} ${fSize}px Inter, sans-serif`;
     ctx.textAlign    = 'center';
     ctx.textBaseline = above ? 'bottom' : 'top';
@@ -242,51 +240,21 @@ function _draw(t) {
     const a  = Math.min(p.t * 5, 1, (1 - p.t) * 5);
     ctx.beginPath();
     ctx.arc(px, py, p.size, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255,255,255,${0.85 * a})`;
+    ctx.fillStyle = `rgba(${accent},${0.85 * a})`;
     ctx.fill();
   });
 
-  /* ── Typing text overlay (state 1) ── */
-  if (state === 1 && typingLabel) {
-    const fullText   = typingLabel.lines.join(' ');
-    const totalChars = Math.floor(fullText.length * typingLabel.progress);
-    const cursorOn   = typingLabel.progress < 1 || Math.sin(t * 0.006) > 0;
-
-    /* Positioned at top of canvas, clear of all nodes */
-    const midX       = w * 0.5;
-    const fontSize   = Math.max(13, Math.min(16, w * 0.030));
-    const lineH      = fontSize * 1.6;
-    const startY     = h * 0.05;
-
+  /* ── Feature label overlay ── */
+  if (feat.overlay) {
+    const midX     = w * 0.5;
+    const midY     = h * 0.05;
+    const fontSize = Math.max(13, Math.min(16, w * 0.030));
     ctx.save();
     ctx.font         = `italic 400 ${fontSize}px Newsreader, "Times New Roman", serif`;
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillStyle    = 'rgba(255,255,255,0.60)';
-
-    let charsUsed = 0;
-    let lastVisibleTxt = '';
-    let lastLineY = startY;
-
-    for (let l = 0; l < typingLabel.lines.length; l++) {
-      const line = typingLabel.lines[l];
-      const visible = Math.max(0, Math.min(line.length, totalChars - charsUsed));
-      const txt = line.slice(0, visible);
-      const lineY = startY + l * lineH;
-
-      ctx.fillText(txt, midX, lineY);
-
-      lastVisibleTxt = txt;
-      lastLineY = lineY;
-      charsUsed += line.length;
-    }
-
-    /* Blinking cursor */
-    if (cursorOn && lastVisibleTxt.length > 0) {
-      const cursorX = midX + ctx.measureText(lastVisibleTxt).width / 2 + 2;
-      ctx.fillStyle = 'rgba(255,107,26,0.9)';
-      ctx.fillText('▌', cursorX, lastLineY);
-    }
+    ctx.fillStyle    = `rgba(${accent},0.60)`;
+    ctx.fillText(feat.overlay, midX, midY);
     ctx.restore();
   }
 }

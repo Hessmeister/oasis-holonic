@@ -102,13 +102,21 @@
 <script type="module">
   import { PRODUCTS } from './js/products.js';
 
-  // ── Route ────────────────────────────────────────────────────────────────
-  const slug    = new URLSearchParams(location.search).get('p');
+  // ── Route (supports both ?p=slug and #slug) ─────────────────────────────
+  const slug    = new URLSearchParams(location.search).get('p')
+               || location.hash.replace('#', '');
   const product = PRODUCTS[slug];
 
   if (!product) {
     location.replace('index.html#gallery');
     throw new Error(`Unknown product slug: ${slug}`);
+  }
+
+  // ── Apply per-product accent color ──────────────────────────────────────
+  if (product.accent) {
+    const [r, g, b] = product.accent.split(',');
+    document.documentElement.style.setProperty('--pd-accent', `rgb(${r},${g},${b})`);
+    document.documentElement.style.setProperty('--pd-accent-rgb', product.accent);
   }
 
   // ── Populate hero ────────────────────────────────────────────────────────
