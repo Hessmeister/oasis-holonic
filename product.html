@@ -29,7 +29,7 @@
       <circle cx="200.746" cy="111.116" r="18.8842" fill="#FF5E00"/>
     </svg>
   </a>
-  <a href="index#gallery" class="pd-back">← Products</a>
+  <a href="index.html#gallery" class="pd-back">&larr; Products</a>
 </nav>
 
 <!-- HERO -->
@@ -38,6 +38,23 @@
     <span id="pd-category" class="pd-category"></span>
     <h1 id="pd-tagline" class="pd-tagline"></h1>
     <p id="pd-description" class="pd-description"></p>
+
+    <div class="pd-hero-meta" id="pd-hero-meta">
+      <div class="pd-meta-col">
+        <span class="pd-meta-label">Product</span>
+        <span class="pd-meta-value" id="pd-meta-name"></span>
+      </div>
+      <div class="vdiv"></div>
+      <div class="pd-meta-col">
+        <span class="pd-meta-label">Category</span>
+        <span class="pd-meta-value" id="pd-meta-category"></span>
+      </div>
+      <div class="vdiv"></div>
+      <div class="pd-meta-col">
+        <span class="pd-meta-label">Tags</span>
+        <span class="pd-meta-value" id="pd-meta-tags"></span>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -51,12 +68,12 @@
 
 <!-- CTA STRIP -->
 <section class="pd-cta" id="pd-cta">
-  <a id="pd-docs-btn"   href="#" class="pd-cta-btn pd-cta-btn--primary">Docs →</a>
-  <a id="pd-github-btn" href="#" class="pd-cta-btn pd-cta-btn--ghost">GitHub →</a>
+  <a id="pd-docs-btn"   href="#" class="pd-cta-btn pd-cta-btn--primary">Documentation &rarr;</a>
+  <a id="pd-github-btn" href="#" class="pd-cta-btn pd-cta-btn--ghost">View on GitHub &rarr;</a>
 </section>
 
 <!-- FOOTER -->
-<div class="footer reveal">
+<div class="footer">
   <div class="footer-col">
     <span class="footer-label">Project</span>
     <span class="footer-value">OASIS: Open Advanced<br>Scalable Interoperable System</span>
@@ -90,7 +107,7 @@
   const product = PRODUCTS[slug];
 
   if (!product) {
-    location.replace('index#gallery');
+    location.replace('index.html#gallery');
     throw new Error(`Unknown product slug: ${slug}`);
   }
 
@@ -100,11 +117,16 @@
   document.getElementById('pd-tagline').innerHTML       = product.tagline;
   document.getElementById('pd-description').textContent = product.description;
 
+  // ── Populate hero metadata ─────────────────────────────────────────────
+  document.getElementById('pd-meta-name').textContent     = product.name;
+  document.getElementById('pd-meta-category').textContent = product.category;
+  document.getElementById('pd-meta-tags').textContent     = product.tags.join(' · ');
+
   // ── Build feature list ───────────────────────────────────────────────────
   const featuresEl = document.getElementById('pd-features');
   product.features.forEach((f, i) => {
     const div = document.createElement('div');
-    div.className = 'pd-feature';
+    div.className = 'pd-feature' + (i === 0 ? ' is-active' : '');
     div.dataset.featureIndex = i;
 
     const codeBlock = f.code
@@ -132,9 +154,10 @@
   const canvas = document.getElementById('pd-canvas');
   const anim   = await import(`./js/anim/${product.animation}.js`);
   anim.init(canvas);
+  anim.setFeature(0);
   anim.start();
 
-  // ── IntersectionObserver: feature scroll → setFeature ───────────────────
+  // ── IntersectionObserver: feature scroll → setFeature ─────────────────
   const featObs = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (!e.isIntersecting) return;
@@ -151,7 +174,7 @@
 
   document.querySelectorAll('.pd-feature').forEach(el => featObs.observe(el));
 
-  // ── IntersectionObserver: pause animation when off-screen ────────────────
+  // ── IntersectionObserver: pause animation when off-screen ──────────────
   const visObs = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting) anim.start(); else anim.stop();

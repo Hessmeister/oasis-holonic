@@ -1,20 +1,23 @@
 /* ═══════════════════════════════════════
    product.css — Product detail page styles
-   Sticky-split layout + hero + CTA strip
+   Swiss editorial · Sticky-split layout
    ═══════════════════════════════════════ */
 
 /* ── Product nav ─────────────────────────────────────────────────────────── */
 .pd-nav {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--pad);
-  height: 56px;
-  background: var(--bg-sage);
-  border-bottom: 1px solid rgba(30,28,26,0.12);
+  padding: 1rem var(--page-pad);
+  background: rgba(214,208,202,0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
 }
 
 .pd-nav-logo {
@@ -25,85 +28,156 @@
 }
 
 .pd-nav-logo .nav-logo-svg {
-  height: 24px;
+  height: 1.15rem;
   width: auto;
   color: var(--black);
 }
 
 .pd-back {
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.01em;
-  color: var(--black);
+  letter-spacing: 0.02em;
+  color: var(--gray);
   text-decoration: none;
-  opacity: 0.55;
-  transition: opacity 0.2s;
+  transition: color 0.3s;
 }
-.pd-back:hover { opacity: 1; }
+.pd-back:hover { color: var(--orange); }
+
 
 /* ── Hero ─────────────────────────────────────────────────────────────────── */
 .pd-hero {
   position: relative;
   display: flex;
-  align-items: center;
-  gap: 3rem;
-  padding: 5rem var(--pad) 4rem;
-  background: var(--near-black);
+  align-items: flex-end;
+  padding: 10rem var(--page-pad) 4rem;
+  background: #1A1816;
+  color: rgba(239, 236, 232, 0.9);
   overflow: hidden;
+  min-height: 44vh;
+}
+
+/* Subtle gradient overlay at bottom */
+.pd-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(to bottom, transparent, rgba(26,24,22,0.4));
+  pointer-events: none;
 }
 
 .pd-hero-text {
   position: relative;
   z-index: 1;
-  flex: 1;
-  min-width: 0;
+  max-width: var(--page-max);
+  margin: 0 auto;
+  width: 100%;
 }
 
 .pd-category {
   display: block;
   font-family: var(--font-sans);
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--orange);
-  margin-bottom: 0.75rem;
+  margin-bottom: 1.2rem;
 }
 
 .pd-tagline {
-  font-family: var(--font-serif);
-  font-size: clamp(2rem, 4vw, 3.2rem);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  color: #fff;
-  margin: 0 0 1.2rem;
+  font-size: clamp(2.4rem, 5vw, 3.8rem);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  color: rgba(239, 236, 232, 0.97);
+  margin: 0 0 1.5rem;
+  max-width: 700px;
 }
 
 .pd-tagline em {
+  font-family: var(--font-serif);
+  font-weight: 400;
   font-style: italic;
+  letter-spacing: -0.01em;
   color: var(--orange);
 }
 
 .pd-description {
   font-family: var(--font-sans);
-  font-size: 1rem;
-  line-height: 1.7;
-  color: rgba(255,255,255,0.65);
-  max-width: 46ch;
+  font-size: clamp(0.9rem, 1.2vw, 1.02rem);
+  line-height: 1.72;
+  color: rgba(239, 236, 232, 0.6);
+  max-width: 520px;
   margin: 0;
 }
+
+/* ── Hero bottom metadata bar ─────────────────────────────────────────────── */
+.pd-hero-meta {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  border-top: 1px solid rgba(239, 236, 232, 0.12);
+  padding-top: 2rem;
+  margin-top: 2.5rem;
+  max-width: var(--page-max);
+  width: 100%;
+}
+
+.pd-hero-meta .vdiv {
+  background: rgba(239, 236, 232, 0.12);
+}
+
+.pd-meta-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pd-meta-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.pd-meta-value {
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: rgba(239, 236, 232, 0.65);
+  line-height: 1.5;
+}
+
 
 /* ── Sticky split ─────────────────────────────────────────────────────────── */
 .pd-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  background: var(--near-black);
+  max-width: calc(var(--page-max) + 6rem);
+  margin: 0 auto;
+  background: #1E1C1A;
+  position: relative;
+}
+
+/* Full-bleed dark background behind the constrained grid */
+.pd-split::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 100%;
+  background: #1E1C1A;
+  z-index: -1;
 }
 
 .pd-left {
-  padding: 4rem var(--pad) 4rem calc(var(--pad) + 0.5rem);
+  padding: 5rem var(--page-pad) 5rem 0;
   border-right: 1px solid rgba(255,255,255,0.07);
 }
 
@@ -115,26 +189,30 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
-  background: rgba(255,255,255,0.015);
+  padding: 3rem;
 }
 
 .pd-right canvas {
   width: 100%;
   height: 100%;
-  max-height: 500px;
 }
+
 
 /* ── Feature items ────────────────────────────────────────────────────────── */
 .pd-feature {
-  padding: 2.5rem 0 2.5rem 1.5rem;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
-  border-left: 2px solid rgba(255,255,255,0.1);
-  transition: border-color 0.4s;
+  padding: 3rem 0 3rem 2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-left: 2px solid rgba(255,255,255,0.08);
+  transition: border-color 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.pd-feature:first-child {
+  padding-top: 0;
 }
 
 .pd-feature:last-child {
   border-bottom: none;
+  padding-bottom: 2rem;
 }
 
 .pd-feature.is-active {
@@ -142,86 +220,161 @@
 }
 
 .pd-feature-heading {
-  font-family: var(--font-serif);
-  font-size: 1.45rem;
-  font-weight: 500;
-  color: rgba(255,255,255,0.92);
-  letter-spacing: -0.02em;
-  margin: 0 0 0.75rem;
-  line-height: 1.25;
+  font-size: clamp(1.2rem, 2vw, 1.6rem);
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+  letter-spacing: -0.025em;
+  margin: 0 0 0.85rem;
+  line-height: 1.2;
+  transition: color 0.4s;
 }
 
 .pd-feature.is-active .pd-feature-heading {
-  color: #fff;
+  color: rgba(239, 236, 232, 0.97);
 }
 
 .pd-feature-body {
   font-family: var(--font-sans);
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   line-height: 1.75;
-  color: rgba(255,255,255,0.55);
-  margin: 0 0 1rem;
+  color: rgba(255,255,255,0.42);
+  margin: 0;
+  max-width: 48ch;
+  transition: color 0.4s;
 }
 
 .pd-feature.is-active .pd-feature-body {
-  color: rgba(255,255,255,0.72);
+  color: rgba(255,255,255,0.68);
 }
 
 .pd-feature-code {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 3px;
-  padding: 1rem 1.25rem;
-  margin: 0;
+  padding: 1.25rem 1.5rem;
+  margin: 1.25rem 0 0;
   overflow-x: auto;
+  opacity: 0.5;
+  transition: opacity 0.4s;
+}
+
+.pd-feature.is-active .pd-feature-code {
+  opacity: 1;
 }
 
 .pd-feature-code code {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 0.82rem;
-  line-height: 1.6;
-  color: rgba(255,255,255,0.65);
+  font-family: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  line-height: 1.7;
+  color: rgba(255,255,255,0.62);
   white-space: pre;
+  background: none;
+  padding: 0;
+  border-radius: 0;
 }
+
+/* Syntax hint — orange highlights for key tokens */
+.pd-feature-code .token-key {
+  color: var(--orange);
+}
+
 
 /* ── CTA strip ────────────────────────────────────────────────────────────── */
 .pd-cta {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 3rem var(--pad);
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 4rem var(--page-pad);
+  isolation: isolate;
+}
+
+/* Full-bleed dark background matching section--orange pattern */
+.pd-cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 100%;
+  background: #17120F;
+  z-index: -1;
+}
+
+/* Orange accent bar at top */
+.pd-cta::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 3px;
   background: var(--orange);
+  z-index: 0;
 }
 
 .pd-cta-btn {
   font-family: var(--font-sans);
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.02em;
   text-decoration: none;
-  padding: 0.7rem 1.6rem;
+  padding: 0.7rem 1.8rem;
   border-radius: 2px;
-  transition: opacity 0.2s;
+  transition: all 0.3s;
+  position: relative;
+  z-index: 1;
 }
 
-.pd-cta-btn:hover { opacity: 0.8; }
-
 .pd-cta-btn--primary {
-  background: var(--near-black);
+  background: var(--orange);
   color: #fff;
+  border: 1px solid var(--orange);
+}
+
+.pd-cta-btn--primary:hover {
+  background: #fff;
+  color: var(--orange);
+  border-color: #fff;
 }
 
 .pd-cta-btn--ghost {
   background: transparent;
-  color: var(--near-black);
-  border: 1px solid var(--near-black);
+  color: rgba(239, 236, 232, 0.7);
+  border: 1px solid rgba(239, 236, 232, 0.2);
 }
+
+.pd-cta-btn--ghost:hover {
+  color: #fff;
+  border-color: rgba(239, 236, 232, 0.5);
+}
+
+
+/* ── Footer override — full-bleed on product page ────────────────────────── */
+body:has(.pd-nav) .footer {
+  max-width: none;
+  padding-left: var(--page-pad);
+  padding-right: var(--page-pad);
+}
+
 
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .pd-hero {
-    flex-direction: column;
-    padding: 3rem var(--pad);
+    padding: 7rem var(--page-pad) 3rem;
+    min-height: auto;
+  }
+
+  .pd-hero-meta {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .pd-hero-meta .vdiv {
+    display: none;
   }
 
   .pd-split {
@@ -231,18 +384,20 @@
   .pd-right {
     position: relative;
     top: auto;
-    height: 240px;
+    height: 280px;
     align-self: auto;
     order: -1;
+    padding: 2rem;
   }
 
   .pd-left {
     border-right: none;
-    padding: 2rem var(--pad);
+    padding: 2.5rem var(--page-pad);
   }
 }
 
 @media (max-width: 560px) {
   .pd-tagline { font-size: 1.85rem; }
-  .pd-cta { flex-direction: column; align-items: flex-start; }
+  .pd-cta { flex-direction: column; }
+  .pd-feature { padding-left: 1.25rem; }
 }
