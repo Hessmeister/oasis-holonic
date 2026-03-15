@@ -306,39 +306,40 @@
       </div>
     </div>
 
-    <div style="margin-top:3rem;" class="stagger">
-      <div class="prov-grid">
-        <span class="prov-label">Blockchain</span>
-        <div class="vdiv"></div>
-        <div class="prov-tags">
-          <span class="prov-tag">Ethereum</span>
-          <span class="prov-tag">Solana</span>
-          <span class="prov-tag">Base</span>
-          <span class="prov-tag">EOS</span>
-          <span class="prov-tag">Telos</span>
-          <span class="prov-tag">Polygon</span>
-          <span class="prov-tag">Arbitrum</span>
-        </div>
+    <div class="eco-wrap stagger">
+      <div class="eco-filters" role="group" aria-label="Filter providers">
+        <button class="eco-filter is-active" data-filter="all">All</button>
+        <button class="eco-filter" data-filter="blockchain">Blockchain</button>
+        <button class="eco-filter" data-filter="storage">Storage</button>
+        <button class="eco-filter" data-filter="network">Networks</button>
       </div>
-      <div class="prov-grid">
-        <span class="prov-label">Database</span>
-        <div class="vdiv"></div>
-        <div class="prov-tags">
-          <span class="prov-tag">MongoDB</span>
-          <span class="prov-tag">SQLite</span>
-          <span class="prov-tag">Neo4j</span>
-          <span class="prov-tag">Azure Cosmos</span>
-        </div>
-      </div>
-      <div class="prov-grid">
-        <span class="prov-label">Decentral</span>
-        <div class="vdiv"></div>
-        <div class="prov-tags">
-          <span class="prov-tag">Holochain</span>
-          <span class="prov-tag">IPFS</span>
-          <span class="prov-tag">ActivityPub</span>
-          <span class="prov-tag">ThreeFold</span>
-        </div>
+      <div class="eco-pills">
+        <span class="eco-pill" data-cat="blockchain">Ethereum</span>
+        <span class="eco-pill" data-cat="blockchain">Solana</span>
+        <span class="eco-pill" data-cat="blockchain">Base</span>
+        <span class="eco-pill" data-cat="blockchain">Polygon</span>
+        <span class="eco-pill" data-cat="blockchain">Arbitrum</span>
+        <span class="eco-pill" data-cat="blockchain">Optimism</span>
+        <span class="eco-pill" data-cat="blockchain">Avalanche</span>
+        <span class="eco-pill" data-cat="blockchain">BNB Chain</span>
+        <span class="eco-pill" data-cat="blockchain">Fantom</span>
+        <span class="eco-pill" data-cat="blockchain">Radix</span>
+        <span class="eco-pill" data-cat="blockchain">EOS</span>
+        <span class="eco-pill" data-cat="blockchain">Telos</span>
+        <span class="eco-pill" data-cat="blockchain">Zcash</span>
+        <span class="eco-pill" data-cat="blockchain">Aztec</span>
+        <span class="eco-pill" data-cat="storage">MongoDB</span>
+        <span class="eco-pill" data-cat="storage">IPFS</span>
+        <span class="eco-pill" data-cat="storage">AWS</span>
+        <span class="eco-pill" data-cat="storage">Azure</span>
+        <span class="eco-pill" data-cat="storage">Google Cloud</span>
+        <span class="eco-pill" data-cat="storage">Arweave</span>
+        <span class="eco-pill" data-cat="storage">SQLite</span>
+        <span class="eco-pill" data-cat="storage">Neo4j</span>
+        <span class="eco-pill" data-cat="network">Holochain</span>
+        <span class="eco-pill" data-cat="network">ThreeFold</span>
+        <span class="eco-pill" data-cat="network">SOLID</span>
+        <span class="eco-pill" data-cat="network">ActivityPub</span>
       </div>
     </div>
 
@@ -667,6 +668,22 @@
 </div>
 
 <!-- SCRIPTS -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const filters = document.querySelectorAll('.eco-filter');
+    const pills   = document.querySelectorAll('.eco-pill');
+    filters.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filters.forEach(b => b.classList.remove('is-active'));
+        btn.classList.add('is-active');
+        const cat = btn.dataset.filter;
+        pills.forEach(pill => {
+          pill.classList.toggle('is-hidden', cat !== 'all' && pill.dataset.cat !== cat);
+        });
+      });
+    });
+  });
+</script>
 <script type="module" src="js/main.js"></script>
 <script type="module" src="js/mesh.js"></script>
 <script type="module" src="js/rings.js"></script>
