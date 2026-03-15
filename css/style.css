@@ -1537,7 +1537,7 @@ nav.nav-collapsed.nav-open .nav-links .nav-btn {
   margin: 0 auto;
   padding: 2.5rem var(--page-pad) 3rem;
   display: grid;
-  grid-template-columns: 1fr 1px 1fr 1px 1fr;
+  grid-template-columns: 1fr 1px 1fr 1px 1fr 1px 1fr;
   gap: 0 2rem;
   position: relative;
   color: var(--white);
