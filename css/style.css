@@ -1801,3 +1801,64 @@ nav.nav-collapsed.nav-open .nav-links .nav-btn {
     margin-left: 0.5rem;
   }
 }
+
+
+/* ═══════════════════════════════════════
+   KERNEL INTRO
+   ═══════════════════════════════════════ */
+
+.kernel-intro {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: rgba(239,236,232,0.72);
+  max-width: 640px;
+  margin-bottom: 2.5rem;
+}
+
+
+/* ═══════════════════════════════════════
+   PROVIDERS INTRO
+   ═══════════════════════════════════════ */
+
+.providers-intro {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: rgba(239,236,232,0.72);
+  max-width: 640px;
+  margin-bottom: 2.5rem;
+}
+
+
+/* ═══════════════════════════════════════
+   DEV PORTAL (Section 10)
+   ═══════════════════════════════════════ */
+
+.devportal-intro {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: rgba(239,236,232,0.72);
+  max-width: 600px;
+  margin-bottom: 3rem;
+}
+
+.devportal-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.devportal-link {
+  display: inline-block;
+  margin-top: auto;
+  padding-top: 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #FF5E00;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.devportal-link:hover {
+  opacity: 0.7;
+}

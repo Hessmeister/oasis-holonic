@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OASIS — Holonic Architecture</title>
+  <title>OASIS: Holonic Architecture</title>
   <meta name="description" content="OASIS is a unified data layer across blockchains, databases, and decentralized networks. All data is stored as holons — self-contained entities that nest, replicate, and move between providers without data loss.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -35,6 +35,7 @@
     <a href="#providers">Providers</a>
     <a href="#star">STAR ODK</a>
     <a href="#gallery">Gallery</a>
+    <a href="#dev-portal">Dev Portal</a>
     <a href="#build">Build</a>
     <a href="https://github.com/NextGenSoftwareUK/OASIS" target="_blank" class="nav-btn">Source</a>
   </div>
@@ -60,7 +61,7 @@
   <div class="hero-bottom">
     <div class="hb-col">
       <span class="hb-label">Project</span>
-      <span class="hb-value">OASIS &mdash; Open Application<br>Integrated Standard</span>
+      <span class="hb-value">OASIS: Open Advanced<br>Scalable Interoperable System</span>
     </div>
     <div class="vdiv"></div>
     <div class="hb-col">
@@ -70,12 +71,12 @@
     <div class="vdiv"></div>
     <div class="hb-col">
       <span class="hb-label">Stack</span>
-      <span class="hb-value">.NET / C# &mdash; REST API</span>
+      <span class="hb-value">.NET / C# · REST API</span>
     </div>
     <div class="vdiv"></div>
     <div class="hb-col">
       <span class="hb-label">License</span>
-      <span class="hb-value">Open Source &mdash; MIT</span>
+      <span class="hb-value">Open Source · MIT</span>
     </div>
   </div>
 
@@ -108,8 +109,8 @@
       <div class="vdiv"></div>
       <div class="def-right">
         <p>A <strong>holon</strong> is both a self-contained entity and a component of a larger system. It is whole on its own. It is also a part.</p>
-        <p>In OASIS, every data entity is a holon: users, applications, quests, NFTs, game objects. Each holon carries a unique GUID, parent-child references, extensible metadata, and provider-agnostic storage keys.</p>
-        <p>This means any holon can be stored on any provider &mdash; and moved between them without data loss. One data structure. Every backend.</p>
+        <p>In OASIS, every data entity is a holon: users, applications, quests, NFTs, game objects. Each one knows what it is, where it belongs, and how to travel between providers without losing a single byte.</p>
+        <p>One data structure. Every backend.</p>
       </div>
     </div>
 
@@ -126,7 +127,7 @@
       <div class="vdiv"></div>
       <div class="col3-item">
         <h3 class="col3-title">Portability</h3>
-        <p class="col3-desc">Each holon maps its ID to every provider it touches via <code>ProviderUniqueStorageKey</code>. Move between Ethereum, MongoDB, Holochain &mdash; zero data loss.</p>
+        <p class="col3-desc">Each holon maps its ID to every provider it touches via <code>ProviderUniqueStorageKey</code>. Move between Ethereum, MongoDB, or Holochain with zero data loss.</p>
       </div>
     </div>
 
@@ -141,6 +142,8 @@
       <h2>The kernel that<br>never <em>compromises</em></h2>
     </div>
 
+    <p class="kernel-intro">Every read and write in OASIS passes through the kernel. It enforces invariants: holons must carry valid GUIDs, parent references must resolve, provider keys must map to real storage. These rules are not optional and cannot be bypassed by the application layer. Whether one provider is active or ten are running in parallel, the kernel guarantees that what goes in is exactly what comes out.</p>
+
     <div class="kernel-container">
       <canvas id="kernelCanvas" class="anim-canvas"></canvas>
     </div>
@@ -153,16 +156,16 @@
 
     <div class="section-head">
       <span class="sh-num">03</span>
-      <h2>Holons inside holons,<br>all the <em>way up</em></h2>
+      <h2>From zome<br>to <em>omniverse</em></h2>
     </div>
 
     <div class="holarchy-body">
 
       <!-- Explanation block -->
       <div class="holarchy-intro">
-        <p>A single holon is powerful. But the real architecture emerges when holons <strong>nest</strong>. OASIS organises all data into a <strong>celestial hierarchy</strong> &mdash; a holarchy &mdash; where every level is both a self-contained whole and a part of something larger.</p>
-        <p>The STAR ODK maps this to a cosmic metaphor: <strong>Stars</strong> contain <strong>Planets</strong>, Planets contain <strong>Moons</strong>, and Moons contain <strong>Zomes</strong> &mdash; the atomic holons at the bottom. At every level, the same rules apply: identity, persistence, interoperability.</p>
-        <p class="holarchy-mapping-note"><span class="holarchy-mapping-label">Celestial mapping &mdash;</span> Omniverse &rarr; Multiverse &rarr; Universe &rarr; Galaxy &rarr; Solar&nbsp;System &rarr; <strong>Star</strong> &rarr; <strong>Planet</strong> &rarr; <strong>Moon</strong> &rarr; <strong>Zome</strong> &rarr; <strong>Holon</strong></p>
+        <p>A single holon is powerful. But the real architecture emerges when holons <strong>nest</strong>. OASIS organises all data into a <strong>celestial hierarchy</strong> (a holarchy) where every level is both a self-contained whole and a part of something larger.</p>
+        <p>The STAR ODK maps this to a cosmic scale: Zomes group holons, Moons bundle Zomes into micro-apps, Planets unite Moons into feature domains, and Stars are full platform ecosystems. Apps grow through this hierarchy: a Moon earns its way to a Planet, and a Planet to a Star. Every level unlocks greater capability, visibility, and reach across the OASIS ecosystem.</p>
+        <p class="holarchy-mapping-note"><span class="holarchy-mapping-label">Celestial mapping:</span> <strong>Holon</strong> &rarr; <strong>Zome</strong> &rarr; <strong>Moon</strong> &rarr; <strong>Planet</strong> &rarr; <strong>Star</strong> &rarr; Solar&nbsp;System &rarr; Galaxy &rarr; Universe &rarr; Multiverse &rarr; Omniverse</p>
       </div>
 
       <!-- Orbit animation (right column) -->
@@ -175,13 +178,8 @@
     <!-- Tiers grid below -->
     <div class="col4 stagger" style="margin-top:2rem;">
       <div class="col4-item">
-        <h3 class="col4-title">Stars</h3>
-        <p class="col4-desc">Top-level platforms &mdash; full OAPPs with their own ecosystems. A Star is an application that contains Planets and Moons as sub-modules. Think of it as the root of an entire product.</p>
-      </div>
-      <div class="vdiv"></div>
-      <div class="col4-item">
-        <h3 class="col4-title">Planets</h3>
-        <p class="col4-desc">Major modules or feature domains within a Star. Each Planet is a holon &mdash; independently deployable, with its own children &mdash; but bound to its parent Star&rsquo;s identity.</p>
+        <h3 class="col4-title">Zomes &amp; Holons</h3>
+        <p class="col4-desc">The atomic layer. Zomes group related holons (profiles, quests, NFTs, game items) into logical bundles. Each holon is the leaf node: one piece of data, stored on any provider.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col4-item">
@@ -190,8 +188,13 @@
       </div>
       <div class="vdiv"></div>
       <div class="col4-item">
-        <h3 class="col4-title">Zomes &amp; Holons</h3>
-        <p class="col4-desc">The atomic layer. Zomes group related holons &mdash; profiles, quests, NFTs, game items &mdash; into logical bundles. Each holon is the leaf node: one piece of data, stored on any provider.</p>
+        <h3 class="col4-title">Planets</h3>
+        <p class="col4-desc">Major modules or feature domains within a Star. Each Planet is a holon, independently deployable with its own children, bound to its parent Star's identity.</p>
+      </div>
+      <div class="vdiv"></div>
+      <div class="col4-item">
+        <h3 class="col4-title">Stars</h3>
+        <p class="col4-desc">Top-level platforms with their own ecosystems. A Star is an application that contains Planets and Moons as sub-modules. The root of an entire product.</p>
       </div>
     </div>
 
@@ -205,6 +208,8 @@
       <span class="sh-num">04</span>
       <h2>One interface,<br>every <em>provider</em></h2>
     </div>
+
+    <p class="providers-intro">With OASIS, all providers come pre-integrated. It is as easy as a single call to hit your choice of blockchain or provider. No custom adapters, no integration tax, no vendor lock-in.</p>
 
     <!-- Flow particle animation -->
     <div class="flow-container">
@@ -259,7 +264,7 @@
       <div class="vdiv"></div>
       <div class="col3-item">
         <h3 class="col3-title">COSMIC ORM</h3>
-        <p class="col3-desc">Maps your data models to holons automatically. Your classes inherit holon properties &mdash; GUID, versioning, provider keys &mdash; without manual wiring.</p>
+        <p class="col3-desc">Maps your data models to holons automatically. Your classes inherit holon properties (GUID, versioning, provider keys) without manual wiring.</p>
       </div>
       <div class="vdiv"></div>
       <div class="col3-item">
@@ -308,6 +313,7 @@
         <div class="prov-tags">
           <span class="prov-tag">Ethereum</span>
           <span class="prov-tag">Solana</span>
+          <span class="prov-tag">Base</span>
           <span class="prov-tag">EOS</span>
           <span class="prov-tag">Telos</span>
           <span class="prov-tag">Polygon</span>
@@ -515,7 +521,7 @@
       <div class="vc-step">
         <span class="vc-num">04</span>
         <h3 class="vc-title">Export</h3>
-        <p class="vc-desc">Download your <code>star-config.json</code> &mdash; the complete project definition for the STAR CLI.</p>
+        <p class="vc-desc">Download your <code>star-config.json</code>: the complete project definition for the STAR CLI.</p>
       </div>
       <div class="vc-arrow">&#8594;</div>
       <div class="vc-step">
@@ -526,8 +532,47 @@
     </div>
 
     <div class="vc-cta stagger">
-      <button class="vc-launch-btn" disabled>Launch VibeCode &mdash; <span class="vc-coming">coming soon</span></button>
+      <button class="vc-launch-btn" disabled>Launch VibeCode <span class="vc-coming">coming soon</span></button>
       <p class="vc-note">VibeCode is in development. <a href="https://github.com/NextGenSoftwareUK/OASIS" target="_blank">Watch the repo</a> for early access.</p>
+    </div>
+
+  </section>
+
+
+  <!-- 10 — DEV PORTAL -->
+  <section id="dev-portal" class="section section--dark reveal">
+
+    <div class="section-head">
+      <span class="sh-num">10</span>
+      <h2>Dev Portal.<br><em>Everything you need.</em></h2>
+    </div>
+
+    <p class="devportal-intro">All OASIS developer resources in one place. APIs, MCP server, SDKs, and IDE integrations to wire OASIS into any workflow.</p>
+
+    <div class="col4 stagger">
+      <div class="col4-item devportal-card">
+        <h3 class="col4-title">REST API</h3>
+        <p class="col4-desc">Full CRUD for holons, avatars, and provider operations. Authenticated via JWT. One endpoint for every backend.</p>
+        <a href="https://github.com/NextGenSoftwareUK/OASIS/wiki" target="_blank" class="devportal-link">API Docs &rarr;</a>
+      </div>
+      <div class="vdiv"></div>
+      <div class="col4-item devportal-card">
+        <h3 class="col4-title">MCP Server</h3>
+        <p class="col4-desc">Model Context Protocol server for OASIS. Connect any AI agent directly to the holon layer without writing custom tools.</p>
+        <a href="https://github.com/NextGenSoftwareUK/OASIS" target="_blank" class="devportal-link">MCP Docs &rarr;</a>
+      </div>
+      <div class="vdiv"></div>
+      <div class="col4-item devportal-card">
+        <h3 class="col4-title">SDKs</h3>
+        <p class="col4-desc">.NET, JavaScript, and Unity SDKs wrap the OASIS API with typed clients, provider configuration, and automatic failover.</p>
+        <a href="https://github.com/NextGenSoftwareUK/OASIS/wiki" target="_blank" class="devportal-link">SDK Docs &rarr;</a>
+      </div>
+      <div class="vdiv"></div>
+      <div class="col4-item devportal-card">
+        <h3 class="col4-title">IDE Extensions</h3>
+        <p class="col4-desc">VS Code and JetBrains extensions for holon scaffolding, provider autocomplete, and STAR CLI integration.</p>
+        <a href="https://github.com/NextGenSoftwareUK/OASIS" target="_blank" class="devportal-link">Extensions &rarr;</a>
+      </div>
     </div>
 
   </section>
@@ -537,11 +582,11 @@
   <section id="build" class="section section--orange reveal">
 
     <div class="section-head">
-      <span class="sh-num">10</span>
+      <span class="sh-num">11</span>
       <h2>Now<br><em>build it.</em></h2>
     </div>
 
-    <p class="build-intro">Every holon starts as an idea. Tell us what you&rsquo;d build on OASIS &mdash; a game, a DAO tool, a cross-chain bridge, anything. We collect every idea and help the best ones get started.</p>
+    <p class="build-intro">Every holon starts as an idea. Tell us what you&rsquo;d build on OASIS: a game, a DAO tool, a cross-chain bridge, anything. We collect every idea and help the best ones get started.</p>
 
     <!-- Chat input -->
     <div class="build-chat">
@@ -598,7 +643,7 @@
 <div class="footer reveal">
   <div class="footer-col">
     <span class="footer-label">Project</span>
-    <span class="footer-value">OASIS &mdash; Open Application<br>Integrated Standard</span>
+    <span class="footer-value">OASIS: Open Advanced<br>Scalable Interoperable System</span>
   </div>
   <div class="vdiv"></div>
   <div class="footer-col">
