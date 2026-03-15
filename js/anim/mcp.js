@@ -11,11 +11,12 @@ let _litState = {};
 let typingLabel = null;
 let agentLabels = ['Agent', 'Agent', 'Agent', 'Agent'];
 
+/* Node positions inset from edges so labels have room */
 const NODE_DEFS = [
-  { rx: 0.15, ry: 0.22, shape: 'diamond', agentIdx: 0 },
-  { rx: 0.85, ry: 0.22, shape: 'diamond', agentIdx: 1 },
-  { rx: 0.15, ry: 0.78, shape: 'diamond', agentIdx: 2 },
-  { rx: 0.85, ry: 0.78, shape: 'diamond', agentIdx: 3 },
+  { rx: 0.18, ry: 0.18, shape: 'diamond', agentIdx: 0 },
+  { rx: 0.82, ry: 0.18, shape: 'diamond', agentIdx: 1 },
+  { rx: 0.18, ry: 0.82, shape: 'diamond', agentIdx: 2 },
+  { rx: 0.82, ry: 0.82, shape: 'diamond', agentIdx: 3 },
   { rx: 0.50, ry: 0.50, shape: 'square',  agentIdx: null },
 ];
 
@@ -50,7 +51,11 @@ export function setFeature(index) {
   }
 
   if (index === 1) {
-    typingLabel = { text: '"Mint an NFT on Ethereum and replicate to Solana"', progress: 0, sent: false };
+    typingLabel = {
+      lines: ['"Mint an NFT on Ethereum', 'and replicate to Solana"'],
+      progress: 0,
+      sent: false
+    };
   }
 }
 
@@ -65,9 +70,9 @@ export function stop() {
 }
 
 function _resize() {
-  const parent = canvas.parentElement;
-  w = parent.offsetWidth;
-  h = parent.offsetHeight || Math.min(w * 0.75, 460);
+  const rect = canvas.getBoundingClientRect();
+  w = rect.width  || canvas.parentElement.offsetWidth;
+  h = rect.height || Math.min(w * 0.85, 460);
   canvas.width  = w * dpr;
   canvas.height = h * dpr;
   canvas.style.width  = w + 'px';
@@ -85,7 +90,7 @@ function _spawnAt(from, to, delay = 0) {
     from, to,
     t: -delay,
     speed: 0.0025 + Math.random() * 0.003,
-    size: 1.5 + Math.random(),
+    size: 2 + Math.random() * 1.5,
   });
 }
 
@@ -106,7 +111,7 @@ function _drawShape(x, y, shape, size) {
 
 function _particleNearNode(nodeIdx) {
   const np = _nodePos(nodeIdx);
-  const hit = Math.max(30, w * 0.035);
+  const hit = Math.max(36, w * 0.045);
   for (const p of particles) {
     if (p.t <= 0 || p.t >= 1) continue;
     const fp = _nodePos(p.from), tp = _nodePos(p.to);
@@ -138,12 +143,13 @@ function _draw(t) {
 
   const isPeer = state === 2;
 
+  /* ── Edges ── */
   HUB_EDGES.forEach(([a, b]) => {
     const pa = _nodePos(a), pb = _nodePos(b);
     ctx.beginPath();
     ctx.moveTo(pa.x, pa.y);
     ctx.lineTo(pb.x, pb.y);
-    ctx.strokeStyle = isPeer ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.22)';
+    ctx.strokeStyle = isPeer ? 'rgba(255,255,255,0.06)' : 'rgba(255,255,255,0.18)';
     ctx.lineWidth = 1;
     ctx.stroke();
   });
@@ -153,11 +159,12 @@ function _draw(t) {
     ctx.beginPath();
     ctx.moveTo(pa.x, pa.y);
     ctx.lineTo(pb.x, pb.y);
-    ctx.strokeStyle = isPeer ? 'rgba(255,107,26,0.40)' : 'rgba(255,255,255,0.05)';
+    ctx.strokeStyle = isPeer ? 'rgba(255,107,26,0.45)' : 'rgba(255,255,255,0.04)';
     ctx.lineWidth   = isPeer ? 1.5 : 1;
     ctx.stroke();
   });
 
+  /* ── Ambient particles ── */
   if (state !== 0 && Math.random() < 0.028) {
     const pool = isPeer ? PEER_EDGES : HUB_EDGES;
     const e    = pool[Math.floor(Math.random() * pool.length)];
@@ -165,8 +172,9 @@ function _draw(t) {
     _spawnAt(rev ? e[1] : e[0], rev ? e[0] : e[1]);
   }
 
+  /* ── Typing animation (state 1) ── */
   if (state === 1 && typingLabel) {
-    typingLabel.progress = Math.min(typingLabel.progress + 0.007, 1);
+    typingLabel.progress = Math.min(typingLabel.progress + 0.006, 1);
     if (typingLabel.progress >= 1 && !typingLabel.sent) {
       typingLabel.sent = true;
       _spawnAt(0, 4);
@@ -177,13 +185,15 @@ function _draw(t) {
   particles = particles.filter(p => p.t <= 1.05);
   particles.forEach(p => { p.t += p.speed; });
 
+  /* ── Nodes ── */
   NODE_DEFS.forEach((node, i) => {
     const { x, y } = _nodePos(i);
     const isHub = i === 4;
-    const size  = isHub ? 9 : 7;
+    const size  = isHub ? 12 : 10;
     const isHit = _particleNearNode(i);
     const lit   = _litVal(i, isHit, t);
 
+    /* Glow */
     if (lit > 0.05) {
       const gc  = ctx.createRadialGradient(x, y, 0, x, y, size * 4);
       const col = isHub ? '255,107,26' : '255,255,255';
@@ -193,24 +203,26 @@ function _draw(t) {
       ctx.fillRect(x - size*4.5, y - size*4.5, size*9, size*9);
     }
 
+    /* Shape */
     _drawShape(x, y, node.shape, size);
     ctx.strokeStyle = isHub
       ? `rgba(255,107,26,${0.65 + lit*0.35})`
       : `rgba(255,255,255,${0.50 + lit*0.50})`;
-    ctx.lineWidth = 1 + lit * 0.8;
+    ctx.lineWidth = 1.2 + lit * 0.8;
     ctx.stroke();
 
+    /* Label */
     const label  = isHub ? 'OASIS API' : agentLabels[node.agentIdx];
-    const labelA = 0.65 + lit * 0.35;
+    const labelA = 0.60 + lit * 0.40;
     const weight = lit > 0.3 ? 600 : 400;
-    const fSize  = 10 + lit * 2;
+    const fSize  = 11 + lit * 2;
     const above  = (i === 0 || i === 1);
-    const ly     = above ? y - size - 11 : y + size + 13;
+    const ly     = above ? y - size - 12 : y + size + 14;
 
     ctx.save();
     if (lit > 0.05) {
-      ctx.shadowColor = `rgba(255,255,255,${0.65 * lit})`;
-      ctx.shadowBlur  = 13 * lit;
+      ctx.shadowColor = `rgba(255,255,255,${0.6 * lit})`;
+      ctx.shadowBlur  = 12 * lit;
     }
     ctx.fillStyle    = isHub ? `rgba(255,107,26,${labelA})` : `rgba(255,255,255,${labelA})`;
     ctx.font         = `${weight} ${fSize}px Inter, sans-serif`;
@@ -220,6 +232,7 @@ function _draw(t) {
     ctx.restore();
   });
 
+  /* ── Particles ── */
   particles.forEach(p => {
     if (p.t <= 0 || p.t > 1) return;
     const fp = _nodePos(p.from), tp = _nodePos(p.to);
@@ -233,26 +246,55 @@ function _draw(t) {
     ctx.fill();
   });
 
+  /* ── Typing text overlay (state 1) ── */
   if (state === 1 && typingLabel) {
     const { x, y }  = _nodePos(0);
-    const chars      = Math.floor(typingLabel.text.length * typingLabel.progress);
-    const txt        = typingLabel.text.slice(0, chars);
+    const fullText   = typingLabel.lines.join(' ');
+    const totalChars = Math.floor(fullText.length * typingLabel.progress);
     const cursorOn   = typingLabel.progress < 1 || Math.sin(t * 0.006) > 0;
+    const lineH      = 14;
+    const startY     = y - size_for_typing() - 14 - (typingLabel.lines.length - 1) * lineH;
 
     ctx.save();
-    ctx.fillStyle    = 'rgba(255,255,255,0.70)';
-    ctx.font         = '400 9px "Courier New", monospace';
+    ctx.font         = '400 10px "SF Mono", "Fira Code", Menlo, monospace';
     ctx.textAlign    = 'left';
     ctx.textBaseline = 'bottom';
-    const tw = ctx.measureText(txt).width;
-    ctx.fillText(txt, x - tw / 2, y - 26);
+    ctx.fillStyle    = 'rgba(255,255,255,0.65)';
+
+    let charsUsed = 0;
+    let lastLineWidth = 0;
+    let lastLineY = startY;
+
+    for (let l = 0; l < typingLabel.lines.length; l++) {
+      const line = typingLabel.lines[l];
+      const visible = Math.max(0, Math.min(line.length, totalChars - charsUsed));
+      const txt = line.slice(0, visible);
+      const lineY = startY + l * lineH;
+
+      /* Center the text block above the node */
+      const fullW = ctx.measureText(line).width;
+      const lx = x - fullW / 2;
+      ctx.fillText(txt, lx, lineY);
+
+      lastLineWidth = ctx.measureText(txt).width;
+      lastLineY = lineY;
+      charsUsed += line.length;
+    }
+
+    /* Blinking cursor */
     if (cursorOn) {
+      const lastLine = typingLabel.lines[typingLabel.lines.length - 1];
+      const fullW = ctx.measureText(lastLine).width;
+      const lx = _nodePos(0).x - fullW / 2;
       ctx.fillStyle = 'rgba(255,107,26,0.9)';
-      ctx.fillText('▌', x - tw / 2 + tw, y - 26);
+      ctx.fillText('▌', lx + lastLineWidth, lastLineY);
     }
     ctx.restore();
   }
 }
+
+/* Helper for typing text vertical offset */
+function size_for_typing() { return 10; }
 
 const _loop = (timestamp) => {
   if (!running) return;
