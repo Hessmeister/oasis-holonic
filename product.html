@@ -29,7 +29,7 @@
       <circle cx="200.746" cy="111.116" r="18.8842" fill="#FF5E00"/>
     </svg>
   </a>
-  <a href="index.html#gallery" class="pd-back">← Products</a>
+  <a href="index#gallery" class="pd-back">← Products</a>
 </nav>
 
 <!-- HERO -->
@@ -90,7 +90,7 @@
   const product = PRODUCTS[slug];
 
   if (!product) {
-    location.replace('index.html#gallery');
+    location.replace('index#gallery');
     throw new Error(`Unknown product slug: ${slug}`);
   }
 
