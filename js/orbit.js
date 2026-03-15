@@ -99,7 +99,7 @@ class OrbitAnimation {
   draw(t) {
     const { ctx, size } = this;
     const cx = size / 2;
-    const cy = size * 0.32;
+    const cy = size * 0.42;
     const rp = this.revealProgress;
     const isLooping = this.revealed && rp >= 1;
 
