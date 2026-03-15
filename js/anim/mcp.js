@@ -253,10 +253,10 @@ function _draw(t) {
     const totalChars = Math.floor(fullText.length * typingLabel.progress);
     const cursorOn   = typingLabel.progress < 1 || Math.sin(t * 0.006) > 0;
 
-    /* Positioned between top-left agent and center hub */
+    /* Centered above the hub */
     const hubPos     = _nodePos(4);
-    const midY       = (y + hubPos.y) * 0.48;
-    const midX       = (x + hubPos.x) * 0.5;
+    const midX       = w * 0.5;
+    const midY       = hubPos.y * 0.52;
     const fontSize   = Math.max(12, Math.min(14, w * 0.028));
     const lineH      = fontSize * 1.5;
     const startY     = midY - ((typingLabel.lines.length - 1) * lineH) / 2;
