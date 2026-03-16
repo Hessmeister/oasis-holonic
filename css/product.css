@@ -189,19 +189,19 @@
 
 .pd-right {
   position: sticky;
-  top: 56px;
+  top: 0;
   align-self: start;
-  height: calc(100vh - 56px);
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2.5rem 3rem;
+  padding: 2rem 3rem;
 }
 
 .pd-right canvas {
   width: 100%;
   max-width: 520px;
-  aspect-ratio: 1 / 0.85;
+  aspect-ratio: 1 / 1;
 }
 
 
